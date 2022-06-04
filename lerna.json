@@ -3,5 +3,8 @@
     "apps/*"
   ],
   "version": "independent",
-  "npmClient": "yarn"
+  "npmClient": "yarn",
+  "scripts": {
+    "rebuild": "lerna clean -y && lerna bootstrap"
+  }
 }

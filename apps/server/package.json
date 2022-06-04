@@ -1,8 +1,8 @@
 {
-  "name": "nest-typescript-starter",
+  "name": "server",
   "private": true,
   "version": "1.0.0",
-  "description": "Nest TypeScript starter repository",
+  "description": "Server for todo app",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
@@ -35,7 +35,7 @@
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.1",
     "@types/supertest": "^2.0.11",
-    "@typescript-eslint/eslint-plugin": "^4.29.2",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^4.29.2",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
