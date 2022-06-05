@@ -8,10 +8,10 @@ import * as passport from 'passport'
 
 @Injectable()
 export class RedisMiddleware implements NestMiddleware {
-  constructor(@Inject(REDIS) private readonly redis: RedisClient) {}
+  sessionMiddleware
 
-  use(req: Request, res: Response, next: NextFunction) {
-    session({
+  constructor(@Inject(REDIS) private readonly redis: RedisClient) {
+    this.sessionMiddleware = session({
       store: new (RedisConnect(session))({
         client: this.redis,
         logErrors: true,
@@ -25,8 +25,13 @@ export class RedisMiddleware implements NestMiddleware {
         maxAge: 60000000,
       },
     })
-    passport.initialize()
-    passport.session()
+  }
+
+  use(req: Request, res: Response, next: NextFunction) {
+    this.sessionMiddleware(req, res, next)
+    passport.initialize() //(req, res, next)
+    passport.session() //(req, res, next)
+
     next()
   }
 }

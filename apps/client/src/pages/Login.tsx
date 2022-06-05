@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { LoginData } from '../types'
+import { useLoginMutation } from '../store/auth/authAPI'
 
 export const Login = () => {
   const {
@@ -8,7 +9,12 @@ export const Login = () => {
     formState: { errors },
   } = useForm<LoginData>()
 
-  const onSubmit = (data: LoginData) => console.log(data)
+  const [login] = useLoginMutation()
+
+  const onSubmit = async (data: LoginData) => {
+    const response = await login(data).unwrap()
+    console.log(response)
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

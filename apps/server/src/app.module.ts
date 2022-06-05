@@ -13,14 +13,17 @@ import * as session from 'express-session'
 import { REDIS } from './core/redis/redis.constants'
 import { RedisModule } from './core/redis/redis.module'
 import { PrismaModule } from './core/prisma/prisma.module'
+import { AuthModule } from './modules/auth/auth.module'
+import { UserModule } from './modules/user/user.module'
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     RedisModule,
     PrismaModule,
+    AuthModule,
+    UserModule,
   ],
-  controllers: [],
   providers: [Logger],
 })
 export class AppModule implements NestModule {

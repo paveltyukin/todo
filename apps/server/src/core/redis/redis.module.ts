@@ -1,17 +1,19 @@
 import { Module } from '@nestjs/common'
 import * as Redis from 'redis'
 import { REDIS } from './redis.constants'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 
 @Module({
-  imports: [ConfigModule.forRoot()],
+  imports: [],
   providers: [
     {
       provide: REDIS,
-      useValue: Redis.createClient({
-        port: process.env.REDIS_PORT,
-        host: process.env.REDIS_HOST,
-      }),
+      useFactory: (configService: ConfigService) =>
+        Redis.createClient({
+          port: configService.get<number>('REDIS_PORT'),
+          host: configService.get<string>('REDIS_HOST'),
+        }),
+      inject: [ConfigService],
     },
   ],
   exports: [REDIS],

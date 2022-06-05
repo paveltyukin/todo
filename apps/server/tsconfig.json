@@ -11,6 +11,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["./src/core/typings/express-session/index.d.ts", "./node_modules/@types"]
   }
 }

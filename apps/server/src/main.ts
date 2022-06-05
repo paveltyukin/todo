@@ -10,12 +10,13 @@ const HOST = process.env.HOST
 async function start() {
   const app = await NestFactory.create(AppModule)
 
+  app.enableCors(corsOptions)
   app.use(morgan(process.env.MORGAN_ENV))
 
   const prismaService = app.get(PrismaService)
   await prismaService.enableShutdownHooks(app)
 
-  app.enableCors(corsOptions)
+  app.setGlobalPrefix('api')
 
   await app.listen(PORT, HOST, () =>
     console.log(`Serve started on HOST=${HOST} PORT=${PORT}`)
