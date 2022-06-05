@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+
+  redis:
+    image: redis
+    ports:
+      - 17382:6379
+
+  server:
+    build:
+      context: ./apps/server
+    depends_on:
+      - redis
+    volumes:
+      - ./apps/server:/app
+    ports:
+      - '2000:2000'
+    networks:
+      - default
+      - serverdb
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./apps/server/nginx.conf:/etc/nginx/conf.d/default.conf
+    environment:
+      - VIRTUAL_HOST=todo.dev.local
+    networks:
+      - default
+      - outside
+    depends_on:
+      - server
+
+networks:
+  serverdb:
+    name: serverdb
+    external: true
+  outside:
+    external: true
+    name: nginx-proxy
