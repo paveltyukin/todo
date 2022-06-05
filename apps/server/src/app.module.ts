@@ -6,20 +6,26 @@ import {
   NestModule,
 } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { REDIS } from './redis/redis.constants'
 import * as RedisStore from 'connect-redis'
 import { RedisClient } from 'redis'
 import * as passport from 'passport'
 import * as session from 'express-session'
-import { RedisModule } from './redis/redis.module'
+import { REDIS } from './core/redis/redis.constants'
+import { RedisModule } from './core/redis/redis.module'
+import { PrismaModule } from './core/prisma/prisma.module'
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), RedisModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    RedisModule,
+    PrismaModule,
+  ],
   controllers: [],
   providers: [Logger],
 })
 export class AppModule implements NestModule {
   constructor(@Inject(REDIS) private readonly redis: RedisClient) {}
+
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(
@@ -39,6 +45,7 @@ export class AppModule implements NestModule {
         }),
         passport.initialize(),
         passport.session()
+        // RedisMiddleware
       )
       .forRoutes('*')
   }
