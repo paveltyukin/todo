@@ -1,8 +1,8 @@
-import session from 'express-session'
-import { User } from '@prisma/client'
+import { User as UserFromPrisma } from '@prisma/client'
 
-declare module 'express-session' {
-  export interface SessionData {
-    user?: Partial<User>
+declare global {
+  namespace Express {
+    // eslint-disable-next-line
+    interface User extends UserFromPrisma {}
   }
 }

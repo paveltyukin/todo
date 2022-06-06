@@ -23,7 +23,6 @@ export class AuthController {
   @Post('login')
   async login(@Req() req: Request, @Body() body: AuthLoginDto) {
     const token = await this.tokenService.generate(body)
-    // @ts-ignore
     await this.tokenService.add(req.user.id)
     return token
   }

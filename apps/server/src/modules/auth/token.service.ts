@@ -38,12 +38,11 @@ export class TokenService {
   async add(userId: number): Promise<Partial<Token>> {
     let token: Partial<Token>
     const sessionID = this.request.sessionID
-    console.log(sessionID)
     try {
       token = await this.prisma.token.create({
         data: {
           userId,
-          fingerprint: sessionID,
+          fingerprint: sessionID, /// dfdf
           expiresIn: 1000 * 60 * 60,
         },
       })
