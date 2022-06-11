@@ -2,7 +2,7 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 
 export const corsOptions: CorsOptions = {
   origin: (origin: string, callback) => {
-    const urls = JSON.parse(process.env.CORS_URLS ?? '[]')
+    const urls = JSON.parse(process.env.CORS_URLS)
     if (!origin || urls.includes(origin)) {
       callback(null, true)
     } else {

@@ -1,26 +1,33 @@
-import { NestFactory } from '@nestjs/core'
+import { HttpAdapterHost, NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
-import * as morgan from 'morgan'
+import { NestExpressApplication } from '@nestjs/platform-express'
 import { corsOptions } from './core/utils/corsOptions'
-import { PrismaService } from './core/prisma/prisma.service'
+import { Logger } from '@nestjs/common'
+import * as morgan from 'morgan'
+import { ValidationPipe } from './core/pipes/validation.pipe'
+import { AllExceptionsFilter } from './core/exceptions/all-exceptions-filter'
 
 const PORT = process.env.PORT
 const HOST = process.env.HOST
 
 async function start() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+  })
 
-  app.enableCors(corsOptions)
   app.use(morgan(process.env.MORGAN_ENV))
+  app.enableCors(corsOptions)
 
-  const prismaService = app.get(PrismaService)
-  await prismaService.enableShutdownHooks(app)
+  const logger = app.get(Logger)
 
   app.setGlobalPrefix('api')
 
-  await app.listen(PORT, HOST, () =>
-    console.log(`Serve started on HOST=${HOST} PORT=${PORT}`)
-  )
+  app.useGlobalPipes(new ValidationPipe())
+  const adapterHost = app.get(HttpAdapterHost)
+  app.useGlobalFilters(new AllExceptionsFilter(adapterHost))
+
+  await app.listen(PORT, HOST)
+  logger.log(`🚀 Server start on host = ${HOST}, port = ${PORT}, url: ${await app.getUrl()}`)
 }
 
-start().catch((err) => `Server error = ${err}`)
+start().catch((err) => console.log(`Server error: ${err}`))

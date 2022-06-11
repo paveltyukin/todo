@@ -1,23 +1,21 @@
-import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { PrismaService } from '../../core/prisma/prisma.service'
-import { Token, User } from '@prisma/client'
-import { Request } from 'express'
-import { REQUEST } from '@nestjs/core'
+import { UserEntity } from '../user/entities/user.entity'
+import { TokenEntity } from './entities/token.entity'
+import { TOKENS_REPOSITORY } from '../../core/constants'
+import { Repository } from 'typeorm'
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class TokenService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
-    @Inject(REQUEST) private request: Request
+    @Inject(TOKENS_REPOSITORY)
+    private readonly tokenEntityRepository: Repository<TokenEntity>,
+    private readonly jwtService: JwtService
   ) {}
 
-  async generate(user: Partial<User>) {
+  async generate(user: Partial<UserEntity>) {
     const payload = {
-      surname: user.surname,
-      name: user.name,
-      patronymic: user.patronymic,
+      surname: user.email,
       sub: user.id,
     }
 
@@ -35,16 +33,17 @@ export class TokenService {
     }
   }
 
-  async add(userId: number): Promise<Partial<Token>> {
-    let token: Partial<Token>
-    const sessionID = this.request.sessionID
+  async add(
+    userId: number,
+    fingerprint: string
+  ): Promise<Partial<TokenEntity>> {
+    let token: Partial<TokenEntity>
+
     try {
-      token = await this.prisma.token.create({
-        data: {
-          userId,
-          fingerprint: sessionID, /// dfdf
-          expiresIn: 1000 * 60 * 60,
-        },
+      token = await this.tokenEntityRepository.create({
+        userId,
+        fingerprint,
+        expiresIn: 1000 * 60 * 60,
       })
     } catch (e) {
       throw new BadRequestException()
@@ -53,28 +52,24 @@ export class TokenService {
     return token
   }
 
-  async update(userId: number, refreshToken: string) {}
+  // async update(userId: number, refreshToken: string) {}
 
-  async remove(refreshToken: string) {
+  async remove(refreshToken: string, fingerprint: string) {
     try {
-      await this.prisma.token.delete({
-        where: {
-          refreshToken_fingerprint: {
-            refreshToken: refreshToken,
-            fingerprint: this.request.sessionID,
-          },
-        },
-      })
+      await this.tokenEntityRepository.delete({ refreshToken, fingerprint })
     } catch (e) {
       throw new BadRequestException()
     }
   }
 
-  async findOne(refreshToken: string): Promise<Token> {
-    let tokens: Token[]
+  async findOne(
+    refreshToken: string,
+    fingerprint: string
+  ): Promise<TokenEntity> {
+    let tokens: TokenEntity[]
     try {
-      tokens = await this.prisma.token.findMany({
-        where: { refreshToken, fingerprint: this.request.sessionID },
+      tokens = await this.tokenEntityRepository.find({
+        where: { refreshToken, fingerprint },
       })
     } catch (e) {
       throw new BadRequestException()

@@ -1,10 +1,7 @@
 import { IsString } from 'class-validator'
-import { User } from '@prisma/client'
+import { AuthPassportLoginDto } from './auth-passport-login.dto'
 
-export class AuthLoginDto implements Pick<User, 'email' | 'password'> {
+export class AuthLoginDto extends AuthPassportLoginDto {
   @IsString({ message: 'Должна быть строка' })
-  email: string
-
-  @IsString({ message: 'Должна быть строка' })
-  password: string
+  fingerprint: string
 }

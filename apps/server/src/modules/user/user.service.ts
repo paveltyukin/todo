@@ -1,19 +1,24 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
-import { User } from '@prisma/client'
-import { PrismaService } from '../../core/prisma/prisma.service'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcryptjs'
-import { AuthLoginDto } from '../auth/dto/auth.login.dto'
-import { LocalAuthGuard } from '../auth/guards/local-auth.guard'
+import { UserEntity } from './entities/user.entity'
+import { USERS_REPOSITORY } from '../../core/constants'
+import { Repository } from 'typeorm'
+import { AuthPassportLoginDto } from '../auth/dto/auth-passport-login.dto'
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(USERS_REPOSITORY)
+    private readonly userEntityRepository: Repository<UserEntity>
+  ) {}
 
-  async validateUser(loginData: AuthLoginDto): Promise<Partial<User>> {
-    let user: Partial<User>
+  async validateUser(
+    loginData: AuthPassportLoginDto
+  ): Promise<Partial<UserEntity>> {
+    let user: Partial<UserEntity>
 
     try {
-      user = await this.prisma.user.findUnique({
+      user = await this.userEntityRepository.findOneOrFail({
         where: { email: loginData.email },
       })
     } catch (e) {
@@ -39,7 +44,7 @@ export class UserService {
     return result
   }
 
-  async findOne(email: string): Promise<User | undefined> {
-    return this.prisma.user.findUnique({ where: { email } })
+  async findOne(email: string): Promise<UserEntity | undefined> {
+    return this.userEntityRepository.findOneOrFail({ where: { email } })
   }
 }

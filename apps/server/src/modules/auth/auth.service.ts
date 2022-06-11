@@ -1,23 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { PrismaService } from '../../core/prisma/prisma.service'
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
-  async registration(data: any) {
-    console.log(123)
-  }
+  // async registration(data: any) {}
 
-  async login(data: any) {
-    return [343434]
-  }
+  // async login(data: any) {}
 
-  async logout() {
-    console.log(123)
-  }
+  // async logout() {}
 }

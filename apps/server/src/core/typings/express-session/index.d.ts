@@ -1,8 +1,11 @@
-import { User as UserFromPrisma } from '@prisma/client'
+import { UserEntity } from '../../../modules/user/entities/user.entity'
 
 declare global {
   namespace Express {
-    // eslint-disable-next-line
-    interface User extends UserFromPrisma {}
+    interface User {
+      id: UserEntity['id']
+      email: UserEntity['email']
+      isActivated: UserEntity['isActivated']
+    }
   }
 }

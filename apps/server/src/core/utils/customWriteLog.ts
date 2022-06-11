@@ -7,7 +7,7 @@ export const customWriteLog = (writeObject: string) => {
     currentDate = format(d, 'yyyy-MM-dd HH:mm:ss.SSS')
 
   writeFileSync(
-    `./custom_logs/error-${currentLogFile}.log`,
+    `${process.env.LOG_DIR}/error-${currentLogFile}.log`,
     '[' + currentDate + '] ' + writeObject + '\n',
     { flag: 'a' }
   )
