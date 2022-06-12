@@ -23,6 +23,7 @@ export const authSlice = createSlice({
       state.fingerprint = action.payload
     },
   },
+  extraReducers: (builder) => {},
 })
 
 export const { setFingerprint } = authSlice.actions

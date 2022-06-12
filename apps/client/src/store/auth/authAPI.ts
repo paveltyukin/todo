@@ -1,5 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { LoginData, LoginResponse, RegisterData, User } from '../../types'
+import {
+  CheckAuthResponse,
+  FingerPrintRequest,
+  LoginData,
+  LoginResponse,
+  RegisterData,
+  User,
+} from '../../types'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -28,6 +35,14 @@ export const authApi = createApi({
         credentials: 'include',
       }),
     }),
+    checkAuth: builder.mutation<CheckAuthResponse, FingerPrintRequest>({
+      query: (data) => ({
+        url: 'check-auth',
+        method: 'POST',
+        body: data,
+        credentials: 'include',
+      }),
+    }),
   }),
 })
 
@@ -35,4 +50,5 @@ export const {
   useRegistrationUserMutation,
   useLoginMutation,
   useLogoutMutation,
+  useCheckAuthMutation,
 } = authApi

@@ -4,6 +4,7 @@ import { UserEntity } from '../user/entities/user.entity'
 import { TokenEntity } from './entities/token.entity'
 import { TOKENS_REPOSITORY } from '../../core/constants'
 import { Repository } from 'typeorm'
+import { TokenResponse } from './types'
 
 @Injectable()
 export class TokenService {
@@ -13,15 +14,17 @@ export class TokenService {
     private readonly jwtService: JwtService
   ) {}
 
-  async generate(user: Partial<UserEntity>) {
+  async generate(user: Partial<UserEntity>): Promise<TokenResponse> {
     const payload = {
-      surname: user.email,
+      surname: user.surname,
+      name: user.name,
+      patronymic: user.patronymic,
+      email: user.email,
       sub: user.id,
     }
 
-    return {
-      token: this.jwtService.sign(payload),
-    }
+    const token = await this.jwtService.signAsync(payload)
+    return { token }
   }
 
   async validate(token) {

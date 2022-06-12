@@ -5,6 +5,7 @@ dist/
 bundles/
 build/
 .env
+.env.local
 .next/
 .nuxt/
 .output/

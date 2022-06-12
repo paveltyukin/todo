@@ -11,3 +11,7 @@ export class JwtPayload extends PickType(AuthRegistrationDto, [
   surname: string
   patronymic: string
 }
+
+export interface TokenResponse {
+  token: string
+}

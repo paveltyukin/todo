@@ -47,4 +47,9 @@ export class UserService {
   async findOne(email: string): Promise<UserEntity | undefined> {
     return this.userEntityRepository.findOneOrFail({ where: { email } })
   }
+
+  async generatePassword(password: string) {
+    const salt = await bcrypt.genSalt(Number(process.env.GEN_SALT))
+    return bcrypt.hash(password, salt)
+  }
 }

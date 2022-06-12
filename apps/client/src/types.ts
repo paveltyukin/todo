@@ -16,3 +16,15 @@ export interface User {
   id: string
   email: string
 }
+
+export interface FingerPrintRequest {
+  fingerprint: string
+}
+
+export interface JSXElementTypes {
+  children: JSX.Element
+}
+
+export interface CheckAuthResponse {
+  isAuth: boolean
+}

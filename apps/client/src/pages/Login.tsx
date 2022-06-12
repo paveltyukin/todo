@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { LoginData } from '../types'
 import { useLoginMutation } from '../store/auth/authAPI'
-import { useAppDispatch } from '../store'
 
 export const Login = () => {
   const {
