@@ -2,16 +2,16 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Generated,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm'
 import { UserEntity } from '../../user/entities/user.entity'
-import { randomUUID } from 'crypto'
 
 @Entity({ schema: 'calc', name: 'tokens' })
+@Unique('fingerprint_and_refresh_token_uniq', ['fingerprint', 'refreshToken'])
 export class TokenEntity {
   @PrimaryGeneratedColumn()
   id: number
@@ -19,8 +19,11 @@ export class TokenEntity {
   @Column()
   fingerprint: string
 
-  @Column({ type: 'text', name: 'refresh_token', default: randomUUID() })
-  @Generated('uuid')
+  @Column({
+    type: 'text',
+    name: 'refresh_token',
+    generated: 'uuid',
+  })
   refreshToken: string
 
   @Column({ name: 'expires_in' })
