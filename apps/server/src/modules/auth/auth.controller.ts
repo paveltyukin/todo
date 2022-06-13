@@ -1,10 +1,11 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { LocalAuthGuard } from './guards/local-auth.guard'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { TokenService } from './token.service'
 import { AuthPassportLoginDto } from './dto/auth-passport-login.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
+import { FingerprintGuard } from './guards/fingerprint.guard'
 
 @Controller('auth')
 export class AuthController {
@@ -20,10 +21,20 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req: Request, @Body() body: AuthPassportLoginDto) {
+  async login(
+    @Req() req: Request,
+    @Body() body: AuthPassportLoginDto,
+    @Res() res: Response
+  ) {
     const token = await this.tokenService.generate(req.user)
     await this.tokenService.add(req.user.id, req.body.fingerprint)
-    return token
+    res
+      .cookie('fingerprint', req.body.fingerprint, {
+        domain: process.env.COOKIE_FINGERPRINT_DAMAIN,
+        httpOnly: true,
+        maxAge: 2678400,
+      })
+      .json({ token })
   }
 
   @Post('logout')
@@ -31,6 +42,7 @@ export class AuthController {
     // return this.authService.logout()
   }
 
+  @UseGuards(FingerprintGuard)
   @UseGuards(JwtAuthGuard)
   @Post('check-auth')
   async checkAuth() {

@@ -43,7 +43,7 @@ export class TokenService {
     let token: Partial<TokenEntity>
 
     try {
-      token = await this.tokenEntityRepository.create({
+      token = await this.tokenEntityRepository.save({
         userId,
         fingerprint,
         expiresIn: 1000 * 60 * 60,
@@ -54,8 +54,6 @@ export class TokenService {
 
     return token
   }
-
-  // async update(userId: number, refreshToken: string) {}
 
   async remove(refreshToken: string, fingerprint: string) {
     try {
@@ -84,4 +82,6 @@ export class TokenService {
 
     return tokens[0]
   }
+
+  async refreshToken() {}
 }

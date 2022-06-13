@@ -7,6 +7,7 @@ export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
   async validateUser(payload: JwtPayload): Promise<any> {
-    console.log(234234)
+    try {
+    } catch (e) {}
   }
 }

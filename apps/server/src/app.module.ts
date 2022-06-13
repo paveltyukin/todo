@@ -4,11 +4,7 @@ import { AuthModule } from './modules/auth/auth.module'
 import { UserModule } from './modules/user/user.module'
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env.local' }),
-    AuthModule,
-    UserModule,
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, UserModule],
   providers: [Logger],
 })
 export class AppModule {}

@@ -9,15 +9,17 @@ import { AuthController } from './auth.controller'
 import { TokenService } from './token.service'
 import { tokenProviders } from './providers/token.providers'
 import { DataBaseModule } from '../../core/database/database.module'
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     DataBaseModule,
     UserModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '120s' },
     }),
   ],
   controllers: [AuthController],
