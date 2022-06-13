@@ -1,13 +1,12 @@
 import { useCheckAuthMutation } from '../store/auth/authAPI'
-import { useEffect } from 'react'
 import { JSXElementTypes } from '../types'
+import { Navigate, useLocation } from 'react-router-dom'
 
 export const CheckAuth = ({ children }: JSXElementTypes): JSX.Element => {
-  const [checkAuth, { isLoading, error }] = useCheckAuthMutation()
+  const location = useLocation()
+  const [checkAuth, { isLoading, error, data }] = useCheckAuthMutation()
 
-  useEffect(() => {
-    checkAuth()
-  }, [])
+  checkAuth()
 
   if (isLoading) {
     return <div>loading</div>
@@ -15,6 +14,10 @@ export const CheckAuth = ({ children }: JSXElementTypes): JSX.Element => {
 
   if (error) {
     return <div>err</div>
+  }
+
+  if (!data?.isAuth) {
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   return children

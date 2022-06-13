@@ -15,9 +15,9 @@ root.render(
     <Provider store={store}>
       <BrowserRouter>
         <Root>
-          <CheckAuth>
-            <Router />
-          </CheckAuth>
+          {/*<CheckAuth>*/}
+          <Router />
+          {/*</CheckAuth>*/}
         </Root>
       </BrowserRouter>
     </Provider>

@@ -7,7 +7,7 @@ export interface AuthState {
 }
 
 const initialState: AuthState = {
-  isAuth: true,
+  isAuth: false,
   accessToken: '',
   fingerprint: '',
 }
