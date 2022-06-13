@@ -1,13 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import {
   CheckAuthResponse,
-  FingerPrintRequest,
   LoginData,
   LoginResponse,
   RegisterData,
   User,
 } from '../../types'
-import { RootState, store } from '../index'
+import { RootState } from '../index'
 
 export const authApi = createApi({
   reducerPath: 'authApi',

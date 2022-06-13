@@ -19,8 +19,8 @@ export const authSlice = createSlice({
     setAuth: (state, { payload }: PayloadAction<boolean>) => {
       state.isAuth = payload
     },
-    setFingerprint: (state, action: PayloadAction<string>) => {
-      state.fingerprint = action.payload
+    setFingerprint: (state, { payload }: PayloadAction<string>) => {
+      state.fingerprint = payload
     },
   },
   extraReducers: (builder) => {},
