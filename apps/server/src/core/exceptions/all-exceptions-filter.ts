@@ -3,9 +3,11 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
+  HttpStatus,
 } from '@nestjs/common'
 import { customWriteLog } from '../utils/customWriteLog'
 import { HttpAdapterHost } from '@nestjs/core'
+import { Response } from 'express'
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -16,6 +18,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const ctx = host.switchToHttp()
     const url = httpAdapter.getRequestUrl(ctx.getRequest())
+    const res = ctx.getResponse<Response>()
 
     let message
     if (exception instanceof HttpException && exception.message) {
@@ -24,10 +27,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = 'Ошибка запроса, не заданы обязательные параметры.'
     }
 
+    const httpStatus =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR
+
     customWriteLog(`${url}: ${message}`)
 
-    return {
-      message,
-    }
+    return res.status(httpStatus).json({ message })
   }
 }

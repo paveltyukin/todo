@@ -35,7 +35,7 @@ export class UserService {
     )
 
     if (!passwordEquals) {
-      throw new BadRequestException()
+      throw new BadRequestException('Введите правильно логин, пароль')
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
