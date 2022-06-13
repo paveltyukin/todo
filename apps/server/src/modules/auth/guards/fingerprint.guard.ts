@@ -4,8 +4,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 export class FingerprintGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest()
-
-    if (request.cookies?.fingerprint) {
+    if (request.headers['x-fingerprint']) {
       return true
     }
 

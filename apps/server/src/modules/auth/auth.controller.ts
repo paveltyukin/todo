@@ -3,11 +3,11 @@ import { AuthService } from './auth.service'
 import { LocalAuthGuard } from './guards/local-auth.guard'
 import { Request, Response } from 'express'
 import { TokenService } from './token.service'
-import { AuthPassportLoginDto } from './dto/auth-passport-login.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { FingerprintGuard } from './guards/fingerprint.guard'
 
 @Controller('auth')
+@UseGuards(FingerprintGuard)
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -21,20 +21,12 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(
-    @Req() req: Request,
-    @Body() body: AuthPassportLoginDto,
-    @Res() res: Response
-  ) {
+  async login(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = await this.tokenService.add(req.user.id, '123')
+
     const token = await this.tokenService.generate(req.user)
-    await this.tokenService.add(req.user.id, req.body.fingerprint)
-    res
-      .cookie('fingerprint', req.body.fingerprint, {
-        domain: process.env.COOKIE_FINGERPRINT_DAMAIN,
-        httpOnly: true,
-        maxAge: 2678400,
-      })
-      .json({ token })
+
+    res.json({ token: token.token, refreshToken: refreshToken.refreshToken })
   }
 
   @Post('logout')
@@ -42,7 +34,6 @@ export class AuthController {
     // return this.authService.logout()
   }
 
-  @UseGuards(FingerprintGuard)
   @UseGuards(JwtAuthGuard)
   @Post('check-auth')
   async checkAuth() {
@@ -51,5 +42,11 @@ export class AuthController {
       message: '',
       data: null,
     }
+  }
+
+  @Post('regenerate-refresh-token')
+  async regenerateRefreshToken(@Req() req: Request) {
+    const fingerprint = req.cookies.fingerprint
+    await this.tokenService.regenerateRefreshToken(fingerprint)
   }
 }

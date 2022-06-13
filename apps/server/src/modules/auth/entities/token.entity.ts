@@ -23,6 +23,7 @@ export class TokenEntity {
     type: 'text',
     name: 'refresh_token',
     generated: 'uuid',
+    unique: true,
   })
   refreshToken: string
 

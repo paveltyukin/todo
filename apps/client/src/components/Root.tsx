@@ -1,35 +1,24 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
-import { useAppSelector } from '../store'
+import { useAppDispatch } from '../store'
 import { JSXElementTypes } from '../types'
-import { useCheckAuthMutation } from '../store/auth/authAPI'
-import { Navigate } from 'react-router-dom'
+import { setFingerprint } from '../store/auth/authSlice'
 
 export const Root = ({ children }: JSXElementTypes): JSX.Element => {
-  const selector = useAppSelector((state) => state.auth.fingerprint)
-  const [checkAuth, { isLoading, error, data }] = useCheckAuthMutation()
+  const dispatch = useAppDispatch()
+  const [fingerprint, setFingerprintLocal] = useState('')
 
   useEffect(() => {
     FingerprintJS.load()
       .then((fp) => fp.get())
-      .then((result) => checkAuth({ fingerprint: result.visitorId }))
+      .then((result) => setFingerprintLocal(result.visitorId))
   }, [])
 
-  if (!selector) {
+  if (!fingerprint) {
     return <div>loading</div>
   }
 
-  if (isLoading) {
-    return <div>loading</div>
-  }
-
-  if (error) {
-    return <div>error</div>
-  }
-
-  if (!data?.isAuth) {
-    return <Navigate to="/login" />
-  }
+  dispatch(setFingerprint(fingerprint))
 
   return children
 }

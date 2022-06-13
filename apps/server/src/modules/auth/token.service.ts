@@ -83,5 +83,7 @@ export class TokenService {
     return tokens[0]
   }
 
-  async refreshToken() {}
+  async regenerateRefreshToken(fingerprint: string) {
+    console.log(fingerprint)
+  }
 }

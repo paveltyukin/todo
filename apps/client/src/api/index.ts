@@ -1,18 +1,22 @@
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
+import { store } from '../store'
 
-export const API_URL = `http://localhost:2012/api/auth`
-
+export const API_URL = process.env.REACT_APP_API_URL
 const $api = axios.create({
   withCredentials: true,
   baseURL: API_URL,
 })
 
-$api.interceptors.request.use((config) => {
+$api.interceptors.request.use((config: AxiosRequestConfig) => {
+  const accessToken = store.getState().auth.accessToken
+  const fingerprint = store.getState().auth.fingerprint
+
   if (!config.headers) {
     config.headers = {}
   }
 
-  config.headers.Authorization = `Bearer ${localStorage.getItem('token')}`
+  config.headers.Authorization = `Bearer ${accessToken}`
+  config.headers['x-fingerprint'] = fingerprint
   return config
 })
 
@@ -29,9 +33,12 @@ $api.interceptors.response.use(
     ) {
       originalRequest._isRetry = true
       try {
-        const response = await axios.post(`${API_URL}/refresh-token`, {
-          withCredentials: true,
-        })
+        const response = await axios.post(
+          `${API_URL}/auth/regenerate-refresh-token`,
+          {
+            withCredentials: true,
+          }
+        )
         localStorage.setItem('token', response.data.accessToken)
         return $api.request(originalRequest)
       } catch (e) {
