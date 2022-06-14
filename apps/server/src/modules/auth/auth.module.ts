@@ -10,6 +10,7 @@ import { TokenService } from './token.service'
 import { tokenProviders } from './providers/token.providers'
 import { DataBaseModule } from '../../core/database/database.module'
 import { ConfigModule } from '@nestjs/config'
+import { EntityManager } from 'typeorm'
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { ConfigModule } from '@nestjs/config'
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '120s' },
+      signOptions: { expiresIn: '1s' },
     }),
   ],
   controllers: [AuthController],
@@ -29,6 +30,7 @@ import { ConfigModule } from '@nestjs/config'
     LocalStrategy,
     JwtStrategy,
     ...tokenProviders,
+    EntityManager,
   ],
   exports: [AuthService],
 })

@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm'
-import { DATABASE_CONNECTION } from '../constants'
+import { DATABASE_CONNECTION, DATABASE_CONNECTION_NAME } from '../constants'
+import { getDataSourceToken } from '@nestjs/typeorm'
 
 export const databaseProviders = [
   {
@@ -12,6 +13,7 @@ export const databaseProviders = [
         username: process.env.DATABASE_USER,
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
+        name: DATABASE_CONNECTION_NAME,
         synchronize: true,
         entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
         logging:
@@ -22,5 +24,6 @@ export const databaseProviders = [
 
       return dataSource.initialize()
     },
+    inject: [getDataSourceToken(DATABASE_CONNECTION_NAME)],
   },
 ]

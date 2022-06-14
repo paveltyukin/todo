@@ -2,13 +2,19 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { UserEntity } from '../user/entities/user.entity'
 import { TokenEntity } from './entities/token.entity'
-import { TOKENS_REPOSITORY } from '../../core/constants'
-import { Repository } from 'typeorm'
+import {
+  DATABASE_CONNECTION_NAME,
+  TOKENS_REPOSITORY,
+} from '../../core/constants'
+import { EntityManager, Repository } from 'typeorm'
 import { TokenResponse } from './types'
+import { InjectEntityManager } from '@nestjs/typeorm'
 
 @Injectable()
 export class TokenService {
   constructor(
+    @InjectEntityManager(DATABASE_CONNECTION_NAME)
+    private readonly entityManager: EntityManager,
     @Inject(TOKENS_REPOSITORY)
     private readonly tokenEntityRepository: Repository<TokenEntity>,
     private readonly jwtService: JwtService
@@ -83,7 +89,15 @@ export class TokenService {
     return tokens[0]
   }
 
-  async regenerateRefreshToken(fingerprint: string) {
-    console.log(fingerprint)
+  async regenerateRefreshToken(fingerprint: string, userId: number) {
+    console.log(fingerprint, userId)
+    const queryRunner = this.entityManager.queryRunner
+    console.log(queryRunner)
+    await queryRunner.query('SELECT * FROM calc.users')
+
+    // await this.entityManager.query(
+    //   `SELECT * FROM calc.tokens WHERE fingerprint = $1 AND user_id = $2`,
+    //   [fingerprint, userId]
+    // )
   }
 }

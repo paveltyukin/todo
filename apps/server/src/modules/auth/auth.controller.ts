@@ -47,6 +47,6 @@ export class AuthController {
   @Post('regenerate-refresh-token')
   async regenerateRefreshToken(@Req() req: Request) {
     const fingerprint = req.cookies.fingerprint
-    await this.tokenService.regenerateRefreshToken(fingerprint)
+    await this.tokenService.regenerateRefreshToken(fingerprint, 1)
   }
 }
