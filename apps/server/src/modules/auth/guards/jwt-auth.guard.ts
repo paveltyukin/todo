@@ -6,11 +6,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
 import { Request } from 'express'
 import { JwtService } from '@nestjs/jwt'
 import { TokenService } from '../token.service'
-import { JwtPayload } from '../types'
+import { JwtPayload, TokenResponse } from '../types'
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -23,7 +22,7 @@ export class JwtAuthGuard implements CanActivate {
     const req: Request = context.switchToHttp().getRequest()
     const fingerprint = req.headers['x-fingerprint'] as string
     if (!req.headers.authorization) {
-      throw new UnauthorizedException({ message: 'нет sтокена' })
+      throw new UnauthorizedException({ message: 'нет токена' })
     }
 
     const authHeader = req.headers.authorization
@@ -40,6 +39,8 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const isVerified = await this.jwtService.verifyAsync(authHeaderParts[1])
+      console.log(isVerified)
+      // refreshToken проверка
     } catch (e) {
       const error = e as Error
       if (error.name === 'TokenExpiredError') {
@@ -47,10 +48,21 @@ export class JwtAuthGuard implements CanActivate {
           authHeaderParts[1]
         ) as JwtPayload
 
-        await this.tokenService.regenerateRefreshToken(
-          fingerprint,
-          decodedJwtAccessToken.sub
+        const refreshToken = await this.tokenService.add(
+          decodedJwtAccessToken.sub,
+          fingerprint
         )
+        // к БД запрос на обновление
+        const token = await this.tokenService.generate(req.user)
+
+        req.tokens = {
+          token: token.token,
+          refreshToken: refreshToken.refreshToken,
+        }
+      } else {
+        throw new UnauthorizedException({
+          message: 'ошибка !',
+        })
       }
     }
 

@@ -22,8 +22,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = await this.tokenService.add(req.user.id, '123')
-
+    const fingerprint = req.headers['x-fingerprint'] as string
+    const refreshToken = await this.tokenService.add(req.user.id, fingerprint)
     const token = await this.tokenService.generate(req.user)
 
     res.json({ token: token.token, refreshToken: refreshToken.refreshToken })
@@ -44,9 +44,9 @@ export class AuthController {
     }
   }
 
-  @Post('regenerate-refresh-token')
-  async regenerateRefreshToken(@Req() req: Request) {
-    const fingerprint = req.cookies.fingerprint
-    await this.tokenService.regenerateRefreshToken(fingerprint, 1)
-  }
+  // @Post('regenerate-refresh-token')
+  // async regenerateRefreshToken(@Req() req: Request) {
+  //   const fingerprint = req.headers['x-fingerprint'] as string
+  //   await this.tokenService.add(fingerprint, 1)
+  // }
 }

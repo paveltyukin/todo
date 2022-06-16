@@ -1,4 +1,5 @@
 import { UserEntity } from '../../../modules/user/entities/user.entity'
+import { TokenResponse } from '../../../modules/auth/types'
 
 declare global {
   namespace Express {
@@ -6,6 +7,9 @@ declare global {
       id: UserEntity['id']
       email: UserEntity['email']
       isActivated: UserEntity['isActivated']
+    }
+    interface Request {
+      tokens: TokenResponse
     }
   }
 }

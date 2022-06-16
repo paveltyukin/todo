@@ -1,6 +1,5 @@
 import { DataSource } from 'typeorm'
 import { DATABASE_CONNECTION, DATABASE_CONNECTION_NAME } from '../constants'
-import { getDataSourceToken } from '@nestjs/typeorm'
 
 export const databaseProviders = [
   {
@@ -24,6 +23,5 @@ export const databaseProviders = [
 
       return dataSource.initialize()
     },
-    inject: [getDataSourceToken(DATABASE_CONNECTION_NAME)],
   },
 ]

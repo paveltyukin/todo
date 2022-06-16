@@ -11,4 +11,5 @@ export interface JwtPayload {
 
 export interface TokenResponse {
   token: string
+  refreshToken?: string
 }

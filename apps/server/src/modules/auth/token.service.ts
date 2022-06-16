@@ -6,7 +6,7 @@ import {
   DATABASE_CONNECTION_NAME,
   TOKENS_REPOSITORY,
 } from '../../core/constants'
-import { EntityManager, Repository } from 'typeorm'
+import { DataSource, EntityManager, Repository } from 'typeorm'
 import { TokenResponse } from './types'
 import { InjectEntityManager } from '@nestjs/typeorm'
 
@@ -14,7 +14,7 @@ import { InjectEntityManager } from '@nestjs/typeorm'
 export class TokenService {
   constructor(
     @InjectEntityManager(DATABASE_CONNECTION_NAME)
-    private readonly entityManager: EntityManager,
+    private entityManager: EntityManager,
     @Inject(TOKENS_REPOSITORY)
     private readonly tokenEntityRepository: Repository<TokenEntity>,
     private readonly jwtService: JwtService
@@ -49,13 +49,19 @@ export class TokenService {
     let token: Partial<TokenEntity>
 
     try {
+      await this.tokenEntityRepository.delete({
+        userId,
+        fingerprint,
+      })
+
       token = await this.tokenEntityRepository.save({
         userId,
         fingerprint,
         expiresIn: 1000 * 60 * 60,
       })
     } catch (e) {
-      throw new BadRequestException()
+      const error = e as Error
+      throw new BadRequestException({ message: 'error.name = ' + error.name })
     }
 
     return token
@@ -87,17 +93,5 @@ export class TokenService {
     }
 
     return tokens[0]
-  }
-
-  async regenerateRefreshToken(fingerprint: string, userId: number) {
-    console.log(fingerprint, userId)
-    const queryRunner = this.entityManager.queryRunner
-    console.log(queryRunner)
-    await queryRunner.query('SELECT * FROM calc.users')
-
-    // await this.entityManager.query(
-    //   `SELECT * FROM calc.tokens WHERE fingerprint = $1 AND user_id = $2`,
-    //   [fingerprint, userId]
-    // )
   }
 }
