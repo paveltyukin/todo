@@ -1,11 +1,6 @@
-import {
-  DATABASE_CONNECTION,
-  DATABASE_CONNECTION_NAME,
-  USERS_REPOSITORY,
-} from '../../../core/constants'
+import { DATABASE_CONNECTION, USERS_REPOSITORY } from '../../../core/constants'
 import { DataSource } from 'typeorm'
 import { UserEntity } from '../entities/user.entity'
-import { getDataSourceToken } from '@nestjs/typeorm'
 
 export const userProviders = [
   {

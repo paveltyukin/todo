@@ -38,7 +38,7 @@ export class TokenService {
   async findOneByRefreshTokenAndFingerprint(
     refreshToken: string,
     fingerprint: string
-  ) {
+  ): Promise<Partial<TokenEntity>> {
     return this.tokenEntityRepository.findOne({
       where: { refreshToken, fingerprint },
     })
