@@ -3,10 +3,11 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { useAppDispatch, useAppSelector } from '../store'
 import { JSXElementTypes } from '../types'
 import { setFingerprint } from '../store/auth/authSlice'
+import { getFingerprint } from '../store/auth/selectors'
 
 export const Root = ({ children }: JSXElementTypes): JSX.Element => {
   const dispatch = useAppDispatch()
-  const fingerprint = useAppSelector((state) => state.auth.fingerprint)
+  const fingerprint = useAppSelector(getFingerprint)
 
   useEffect(() => {
     FingerprintJS.load()

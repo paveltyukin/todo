@@ -6,7 +6,7 @@ import {
   DATABASE_CONNECTION_NAME,
   TOKENS_REPOSITORY,
 } from '../../core/constants'
-import { DataSource, EntityManager, Repository } from 'typeorm'
+import { EntityManager, Repository } from 'typeorm'
 import { TokenResponse } from './types'
 import { InjectEntityManager } from '@nestjs/typeorm'
 
@@ -49,16 +49,13 @@ export class TokenService {
     let token: Partial<TokenEntity>
 
     try {
-      await this.tokenEntityRepository.delete({
-        userId,
-        fingerprint,
-      })
-
-      token = await this.tokenEntityRepository.save({
-        userId,
-        fingerprint,
-        expiresIn: 1000 * 60 * 60,
-      })
+      await this.tokenEntityRepository.update(
+        {
+          userId,
+          fingerprint,
+        },
+        { refreshToken: () => 'uuid_generate_v4()' }
+      )
     } catch (e) {
       const error = e as Error
       throw new BadRequestException({ message: 'error.name = ' + error.name })
@@ -73,25 +70,5 @@ export class TokenService {
     } catch (e) {
       throw new BadRequestException()
     }
-  }
-
-  async findOne(
-    refreshToken: string,
-    fingerprint: string
-  ): Promise<TokenEntity> {
-    let tokens: TokenEntity[]
-    try {
-      tokens = await this.tokenEntityRepository.find({
-        where: { refreshToken, fingerprint },
-      })
-    } catch (e) {
-      throw new BadRequestException()
-    }
-
-    if (tokens.length !== 1) {
-      throw new BadRequestException()
-    }
-
-    return tokens[0]
   }
 }
