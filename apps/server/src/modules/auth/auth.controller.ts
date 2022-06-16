@@ -5,6 +5,7 @@ import { Request, Response } from 'express'
 import { TokenService } from './token.service'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { FingerprintGuard } from './guards/fingerprint.guard'
+import { RefreshTokenGuard } from './guards/refresh-token.guard'
 
 @Controller('auth')
 @UseGuards(FingerprintGuard)
@@ -34,6 +35,7 @@ export class AuthController {
     // return this.authService.logout()
   }
 
+  @UseGuards(RefreshTokenGuard)
   @UseGuards(JwtAuthGuard)
   @Post('check-auth')
   async checkAuth() {

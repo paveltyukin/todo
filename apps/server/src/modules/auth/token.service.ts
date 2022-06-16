@@ -9,6 +9,7 @@ import {
 import { EntityManager, Repository } from 'typeorm'
 import { TokenResponse } from './types'
 import { InjectEntityManager } from '@nestjs/typeorm'
+import { TokenRepository } from './token.repository'
 
 @Injectable()
 export class TokenService {
@@ -17,6 +18,7 @@ export class TokenService {
     private entityManager: EntityManager,
     @Inject(TOKENS_REPOSITORY)
     private readonly tokenEntityRepository: Repository<TokenEntity>,
+    private readonly tokenRepository: TokenRepository,
     private readonly jwtService: JwtService
   ) {}
 
@@ -33,42 +35,12 @@ export class TokenService {
     return { token }
   }
 
-  async validate(token) {
-    try {
-      const userData = this.jwtService.verify(token)
-      return userData
-    } catch (e) {
-      return null
-    }
-  }
-
-  async add(
-    userId: number,
+  async findOneByRefreshTokenAndFingerprint(
+    refreshToken: string,
     fingerprint: string
-  ): Promise<Partial<TokenEntity>> {
-    let token: Partial<TokenEntity>
-
-    try {
-      await this.tokenEntityRepository.update(
-        {
-          userId,
-          fingerprint,
-        },
-        { refreshToken: () => 'uuid_generate_v4()' }
-      )
-    } catch (e) {
-      const error = e as Error
-      throw new BadRequestException({ message: 'error.name = ' + error.name })
-    }
-
-    return token
-  }
-
-  async remove(refreshToken: string, fingerprint: string) {
-    try {
-      await this.tokenEntityRepository.delete({ refreshToken, fingerprint })
-    } catch (e) {
-      throw new BadRequestException()
-    }
+  ) {
+    return this.tokenEntityRepository.findOne({
+      where: { refreshToken, fingerprint },
+    })
   }
 }

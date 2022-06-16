@@ -3,7 +3,6 @@ import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
 import { UserModule } from '../user/user.module'
 import { AuthService } from './auth.service'
-import { JwtStrategy } from './strategies/jwt.strategy'
 import { LocalStrategy } from './strategies/local.strategy'
 import { AuthController } from './auth.controller'
 import { TokenService } from './token.service'
@@ -11,6 +10,7 @@ import { tokenProviders } from './providers/token.providers'
 import { DataBaseModule } from '../../core/database/database.module'
 import { ConfigModule } from '@nestjs/config'
 import { EntityManager } from 'typeorm'
+import { TokenRepository } from './token.repository'
 
 @Module({
   imports: [
@@ -27,8 +27,8 @@ import { EntityManager } from 'typeorm'
   providers: [
     AuthService,
     TokenService,
+    TokenRepository,
     LocalStrategy,
-    JwtStrategy,
     ...tokenProviders,
     EntityManager,
   ],
