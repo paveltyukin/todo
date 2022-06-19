@@ -14,14 +14,19 @@ export const authApi = createApi({
     baseUrl: `${process.env.REACT_APP_API_URL}/auth`,
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.accessToken
+      const accessToken = (getState() as RootState).auth.accessToken
       const fingerprint = (getState() as RootState).auth.fingerprint
-      if (token) {
-        headers.set('authorization', `Bearer ${token}`)
+      const refreshToken = (getState() as RootState).auth.refreshToken
+      if (accessToken) {
+        headers.set('authorization', `Bearer ${accessToken}`)
       }
 
       if (fingerprint) {
         headers.set('x-fingerprint', fingerprint)
+      }
+
+      if (fingerprint) {
+        headers.set('x-refresh-token', refreshToken)
       }
 
       return headers

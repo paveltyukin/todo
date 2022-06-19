@@ -33,7 +33,7 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     try {
-      const decode = await this.jwtService.verifyAsync(authHeaderParts[1])
+      const decode = this.jwtService.decode(authHeaderParts[1])
       req.user = await this.userRepository.findOneByIdForRequest(decode.sub)
       next()
     } catch (err) {

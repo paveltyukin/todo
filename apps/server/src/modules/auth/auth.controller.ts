@@ -30,9 +30,9 @@ export class AuthController {
       req.user.id,
       fingerprint
     )
-    const token = await this.tokenService.generateAccessToken(req.user)
+    const accessToken = await this.tokenService.generateAccessToken(req.user)
 
-    res.json({ token, refreshToken: refreshToken.refreshToken })
+    res.json({ accessToken, refreshToken: refreshToken.refreshToken })
   }
 
   @Post('logout')

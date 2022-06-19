@@ -54,12 +54,12 @@ export class JwtAuthGuard implements CanActivate {
           isVerified.sub
         )
 
-      if (existRefreshToken) {
+      if (!existRefreshToken) {
         throw new HttpException({ message: 'refresh token error' }, 401)
       }
 
-      const token = await this.tokenService.generateAccessToken(req.user)
-      req.tokens = { token, refreshToken }
+      const accessToken = await this.tokenService.generateAccessToken(req.user)
+      req.tokens = { accessToken, refreshToken }
     } catch (e) {
       const error = e as Error
       if (error.name === 'TokenExpiredError') {
@@ -80,7 +80,7 @@ export class JwtAuthGuard implements CanActivate {
         )
 
         req.tokens = {
-          token: accessToken,
+          accessToken,
           refreshToken: refreshToken.refreshToken,
         }
       } else {

@@ -14,6 +14,6 @@ export interface UserPayload extends GeneralPayload {
 }
 
 export interface TokenResponse {
-  token: string
+  accessToken: string
   refreshToken?: string
 }

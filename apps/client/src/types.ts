@@ -5,6 +5,7 @@ export interface LoginData {
 
 export interface LoginResponse {
   accessToken: string
+  refreshToken: string
 }
 
 export interface RegisterData {
