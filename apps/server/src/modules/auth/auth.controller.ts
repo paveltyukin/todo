@@ -32,7 +32,7 @@ export class AuthController {
     )
     const token = await this.tokenService.generateAccessToken(req.user)
 
-    res.json({ token: token.token, refreshToken: refreshToken.refreshToken })
+    res.json({ token, refreshToken: refreshToken.refreshToken })
   }
 
   @Post('logout')

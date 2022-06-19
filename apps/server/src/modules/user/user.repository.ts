@@ -1,30 +1,34 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { UserEntity } from './entities/user.entity'
 import { UserPayload } from '../auth/types'
+import { USERS_REPOSITORY } from '../../core/constants'
 
 @Injectable()
 export class UserRepository {
-  constructor(private readonly userRepository: Repository<UserEntity>) {}
+  constructor(
+    @Inject(USERS_REPOSITORY)
+    private readonly userEntityRepository: Repository<UserEntity>
+  ) {}
 
   async findOne(where: Partial<UserEntity>): Promise<Partial<UserEntity>> {
-    let token: Partial<UserEntity>
+    let user: Partial<UserEntity>
 
     try {
-      token = await this.userRepository.findOne({ where })
+      user = await this.userEntityRepository.findOne({ where })
     } catch (e) {
       const error = e as Error
       throw new BadRequestException({ message: 'error.name = ' + error.name })
     }
 
-    return token
+    return user
   }
 
-  async findOneById(id: number): Promise<UserPayload> {
+  async findOneByIdForRequest(id: number): Promise<UserPayload> {
     let user: Partial<UserEntity>
 
     try {
-      user = await this.userRepository.findOne({ where: { id } })
+      user = await this.userEntityRepository.findOne({ where: { id } })
       if (!user) {
         throw new BadRequestException('sdfsdfsdf')
       }

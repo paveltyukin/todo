@@ -58,7 +58,6 @@ export class JwtAuthGuard implements CanActivate {
         throw new HttpException({ message: 'refresh token error' }, 401)
       }
 
-      req.user = await this.userRepository.findOneById(isVerified.sub)
       const token = await this.tokenService.generateAccessToken(req.user)
       req.tokens = { token, refreshToken }
     } catch (e) {
@@ -73,7 +72,7 @@ export class JwtAuthGuard implements CanActivate {
           fingerprint
         )
 
-        req.user = await this.userRepository.findOneById(
+        req.user = await this.userRepository.findOneByIdForRequest(
           decodedJwtAccessToken.sub
         )
 
