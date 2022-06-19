@@ -45,13 +45,11 @@ export const authApi = createApi({
         url: 'login',
         method: 'POST',
         body: data,
-        credentials: 'include',
       }),
     }),
     logout: builder.mutation<void, void>({
       query: () => ({
         url: 'logout',
-        credentials: 'include',
       }),
     }),
     checkAuth: builder.mutation<CheckAuthResponse, void>({

@@ -47,7 +47,7 @@ export class AuthController {
     return {
       status: 'OK',
       message: '',
-      data: null,
+      isAuth: true,
     }
   }
 
