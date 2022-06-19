@@ -9,8 +9,6 @@ import { TokenService } from './token.service'
 import { tokenProviders } from './providers/token.providers'
 import { TokenRepository } from './token.repository'
 import { ConfigModule } from '@nestjs/config'
-import { UserRepository } from '../user/user.repository'
-import { UserService } from '../user/user.service'
 
 @Module({
   imports: [
@@ -19,7 +17,7 @@ import { UserService } from '../user/user.service'
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1s' },
+      signOptions: { expiresIn: '10m' },
     }),
   ],
   controllers: [AuthController],

@@ -75,7 +75,6 @@ export class JwtAuthGuard implements CanActivate {
         req.user = await this.userRepository.findOneByIdForRequest(
           decodedJwtAccessToken.sub
         )
-
         const accessToken = await this.tokenService.generateAccessToken(
           req.user
         )
