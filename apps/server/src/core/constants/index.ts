@@ -1,4 +1,4 @@
 export const DATABASE_CONNECTION = Symbol('DATABASE_CONNECTION')
 export const TOKENS_REPOSITORY = Symbol('TOKENS_REPOSITORY')
 export const USERS_REPOSITORY = Symbol('USERS_REPOSITORY')
-export const DATABASE_CONNECTION_NAME = 'default'
+export const DATABASE_CONNECTION_NAME = 'defaultConnection'

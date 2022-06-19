@@ -3,6 +3,7 @@ import {
   HttpException,
   Inject,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common'
 import { TokenEntity } from './entities/token.entity'
 import { TOKENS_REPOSITORY } from '../../core/constants'
@@ -41,17 +42,18 @@ export class TokenRepository {
     let token: Partial<TokenEntity>
 
     try {
-      const existToken = this.tokenRepository.findOne({
+      const existToken = await this.tokenRepository.findOne({
         where: { userId, fingerprint },
       })
 
       if (existToken) {
-        new HttpException({ message: 'sdsdsdf' }, 401)
+        throw new HttpException({ message: 'sdsdsdf' }, 401)
       }
 
       token = await this.tokenRepository.save({
         userId,
         fingerprint,
+        expiresIn: 1000 * 100 * 60 * 60,
       })
     } catch (e) {
       const error = e as Error
@@ -65,16 +67,58 @@ export class TokenRepository {
     userId: number,
     fingerprint: string
   ): Promise<Partial<TokenEntity>> {
-    let token: Partial<TokenEntity>
-
     try {
-      await this.tokenRepository.update(
-        {
+      const exists = this.tokenRepository.findOne({
+        where: {
           userId,
           fingerprint,
         },
-        { refreshToken: () => 'uuid_generate_v4()' }
-      )
+      })
+
+      if (!exists) {
+        new NotFoundException('не найден')
+      }
+
+      await this.tokenRepository.delete({
+        userId,
+        fingerprint,
+      })
+
+      return this.tokenRepository.save({
+        userId,
+        fingerprint,
+        expiresIn: 1000 * 100 * 60 * 60,
+      })
+    } catch (e) {
+      const error = e as Error
+      throw new BadRequestException({ message: 'error.name = ' + error.name })
+    }
+  }
+
+  async findOne(where: Partial<TokenEntity>): Promise<Partial<TokenEntity>> {
+    let token: Partial<TokenEntity>
+
+    try {
+      token = await this.tokenRepository.findOne({ where })
+    } catch (e) {
+      const error = e as Error
+      throw new BadRequestException({ message: 'error.name = ' + error.name })
+    }
+
+    return token
+  }
+
+  async findOneOrFail(
+    where: Partial<TokenEntity>
+  ): Promise<Partial<TokenEntity>> {
+    let token: Partial<TokenEntity>
+
+    try {
+      token = await this.tokenRepository.findOne({ where })
+
+      if (!token) {
+        throw new HttpException({ message: 'Not found' }, 400)
+      }
     } catch (e) {
       const error = e as Error
       throw new BadRequestException({ message: 'error.name = ' + error.name })

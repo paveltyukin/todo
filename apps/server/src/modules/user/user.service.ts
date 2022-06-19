@@ -22,11 +22,11 @@ export class UserService {
         where: { email: loginData.email },
       })
     } catch (e) {
-      throw new BadRequestException()
+      throw new BadRequestException('wewewe')
     }
 
     if (!user) {
-      throw new BadRequestException()
+      throw new BadRequestException('fgtrttgrtgrg')
     }
 
     const passwordEquals = await bcrypt.compare(

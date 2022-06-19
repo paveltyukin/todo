@@ -6,13 +6,15 @@ import { TokenService } from './token.service'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { FingerprintGuard } from './guards/fingerprint.guard'
 import { RefreshTokenGuard } from './guards/refresh-token.guard'
+import { TokenRepository } from './token.repository'
 
 @Controller('auth')
 @UseGuards(FingerprintGuard)
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly tokenService: TokenService
+    private readonly tokenService: TokenService,
+    private readonly tokenRepository: TokenRepository
   ) {}
 
   @Post('registration')
@@ -24,8 +26,11 @@ export class AuthController {
   @Post('login')
   async login(@Req() req: Request, @Res() res: Response) {
     const fingerprint = req.headers['x-fingerprint'] as string
-    const refreshToken = await this.tokenService.add(req.user.id, fingerprint)
-    const token = await this.tokenService.generate(req.user)
+    const refreshToken = await this.tokenRepository.add(
+      req.user.id,
+      fingerprint
+    )
+    const token = await this.tokenService.generateAccessToken(req.user)
 
     res.json({ token: token.token, refreshToken: refreshToken.refreshToken })
   }
@@ -46,9 +51,11 @@ export class AuthController {
     }
   }
 
-  // @Post('regenerate-refresh-token')
-  // async regenerateRefreshToken(@Req() req: Request) {
-  //   const fingerprint = req.headers['x-fingerprint'] as string
-  //   await this.tokenService.add(fingerprint, 1)
-  // }
+  @UseGuards(RefreshTokenGuard)
+  @UseGuards(JwtAuthGuard)
+  @Post('regenerate-refresh-token')
+  async regenerateRefreshToken(@Req() req: Request) {
+    const fingerprint = req.headers['x-fingerprint'] as string
+    await this.tokenRepository.update(1, fingerprint)
+  }
 }

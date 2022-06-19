@@ -10,12 +10,14 @@ import { JwtService } from '@nestjs/jwt'
 import { TokenService } from '../token.service'
 import { JwtPayload } from '../types'
 import { TokenRepository } from '../token.repository'
+import { UserRepository } from '../../user/user.repository'
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly tokenService: TokenService,
+    private readonly userRepository: UserRepository,
     private readonly tokenRepository: TokenRepository
   ) {}
 
@@ -42,17 +44,23 @@ export class JwtAuthGuard implements CanActivate {
     try {
       const isVerified = await this.jwtService.verifyAsync(authHeaderParts[1])
       if (!isVerified) {
-        new HttpException({ message: 'token error' }, 401)
+        throw new HttpException({ message: 'token error' }, 401)
       }
 
       const existRefreshToken =
-        await this.tokenService.findOneByRefreshTokenAndFingerprint(
+        await this.tokenService.findOneByRefreshTokenFingerprintUserId(
           refreshToken,
-          fingerprint
+          fingerprint,
+          isVerified.sub
         )
+
       if (existRefreshToken) {
-        new HttpException({ message: 'refresh token error' }, 401)
+        throw new HttpException({ message: 'refresh token error' }, 401)
       }
+
+      req.user = await this.userRepository.findOneById(isVerified.sub)
+      const token = await this.tokenService.generateAccessToken(req.user)
+      req.tokens = { token, refreshToken }
     } catch (e) {
       const error = e as Error
       if (error.name === 'TokenExpiredError') {
@@ -64,11 +72,17 @@ export class JwtAuthGuard implements CanActivate {
           decodedJwtAccessToken.sub,
           fingerprint
         )
-        // к БД запрос на обновление
-        const token = await this.tokenService.generate(req.user)
+
+        req.user = await this.userRepository.findOneById(
+          decodedJwtAccessToken.sub
+        )
+
+        const accessToken = await this.tokenService.generateAccessToken(
+          req.user
+        )
 
         req.tokens = {
-          token: token.token,
+          token: accessToken,
           refreshToken: refreshToken.refreshToken,
         }
       } else {

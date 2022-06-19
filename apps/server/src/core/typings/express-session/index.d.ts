@@ -1,13 +1,10 @@
-import { UserEntity } from '../../../modules/user/entities/user.entity'
-import { TokenResponse } from '../../../modules/auth/types'
+import { TokenResponse, UserPayload } from '../../../modules/auth/types'
 
 declare global {
   namespace Express {
-    interface User {
-      id: UserEntity['id']
-      email: UserEntity['email']
-      isActivated: UserEntity['isActivated']
-    }
+    // eslint-disable-next-line
+    interface User extends UserPayload {}
+
     interface Request {
       tokens: TokenResponse
     }
