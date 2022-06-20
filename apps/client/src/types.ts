@@ -4,6 +4,7 @@ export interface LoginData {
 }
 
 export interface LoginResponse {
+  isAuth: boolean
   accessToken: string
   refreshToken: string
 }
@@ -18,14 +19,8 @@ export interface User {
   email: string
 }
 
-export interface FingerPrintRequest {
-  fingerprint: string
-}
-
 export interface JSXElementTypes {
   children: JSX.Element
 }
 
-export interface CheckAuthResponse {
-  isAuth: boolean
-}
+export interface CheckAuthResponse extends LoginResponse {}

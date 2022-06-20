@@ -16,7 +16,7 @@ export const authApi = createApi({
     prepareHeaders: (headers, { getState }) => {
       const accessToken = (getState() as RootState).auth.accessToken
       const fingerprint = (getState() as RootState).auth.fingerprint
-      const refreshToken = (getState() as RootState).auth.refreshToken
+      const refreshToken = localStorage.getItem('refreshToken') ?? ''
       if (accessToken) {
         headers.set('authorization', `Bearer ${accessToken}`)
       }
@@ -25,7 +25,7 @@ export const authApi = createApi({
         headers.set('x-fingerprint', fingerprint)
       }
 
-      if (fingerprint) {
+      if (refreshToken) {
         headers.set('x-refresh-token', refreshToken)
       }
 

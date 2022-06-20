@@ -3,16 +3,17 @@ import { AuthService } from './auth.service'
 import { LocalAuthGuard } from './guards/local-auth.guard'
 import { Request, Response } from 'express'
 import { TokenService } from './token.service'
-import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { FingerprintGuard } from './guards/fingerprint.guard'
 import { RefreshTokenGuard } from './guards/refresh-token.guard'
 import { TokenRepository } from './token.repository'
+import { UserRepository } from '../user/user.repository'
 
 @Controller('auth')
 @UseGuards(FingerprintGuard)
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly userRepository: UserRepository,
     private readonly tokenService: TokenService,
     private readonly tokenRepository: TokenRepository
   ) {}
@@ -41,21 +42,33 @@ export class AuthController {
   }
 
   @UseGuards(RefreshTokenGuard)
-  @UseGuards(JwtAuthGuard)
   @Post('check-auth')
-  async checkAuth() {
+  async checkAuth(@Req() req: Request) {
+    const fingerprint = req.headers['x-fingerprint'] as string
+    const refreshTokenByRequest = req.headers['x-refresh-token'] as string
+    const currentToken =
+      await this.tokenService.findOneByRefreshTokenAndFingerprint(
+        refreshTokenByRequest,
+        fingerprint
+      )
+
+    const updatedToken = await this.tokenRepository.update(
+      currentToken.userId,
+      fingerprint
+    )
+
+    const user = await this.userRepository.findOneByIdForRequest(
+      currentToken.userId
+    )
+
     return {
-      status: 'OK',
-      message: '',
-      isAuth: true,
+      accessToken: this.tokenService.generateAccessToken(user),
+      refreshToken: updatedToken.refreshToken,
     }
   }
 
-  @UseGuards(RefreshTokenGuard)
-  @UseGuards(JwtAuthGuard)
-  @Post('regenerate-refresh-token')
-  async regenerateRefreshToken(@Req() req: Request) {
-    const fingerprint = req.headers['x-fingerprint'] as string
-    await this.tokenRepository.update(1, fingerprint)
-  }
+  // @UseGuards(RefreshTokenGuard)
+  // @UseGuards(JwtAuthGuard)
+  // @Post('regenerate-refresh-token')
+  // async regenerateRefreshToken() {}
 }
