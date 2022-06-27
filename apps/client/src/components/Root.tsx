@@ -16,7 +16,7 @@ export const Root = ({ children }: JSXElementTypes): JSX.Element => {
   const [checkAuth, { isLoading }] = useCheckAuthMutation()
 
   useEffect(() => {
-    ;(async () => {
+    const checkAuthFromUseEffect = async () => {
       const fp = await FingerprintJS.load()
       const result = await fp.get()
       dispatch(setFingerprint(result.visitorId))
@@ -24,7 +24,9 @@ export const Root = ({ children }: JSXElementTypes): JSX.Element => {
       dispatch(setAuth(response.isAuth))
       dispatch(setAccessToken(response.accessToken))
       localStorage.setItem('refreshToken', response.refreshToken)
-    })()
+    }
+
+    checkAuthFromUseEffect()
   }, [])
 
   if (!fingerprint || isLoading) {

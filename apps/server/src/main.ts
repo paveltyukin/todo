@@ -7,6 +7,7 @@ import * as morgan from 'morgan'
 import { ValidationPipe } from './core/pipes/validation.pipe'
 import { AllExceptionsFilter } from './core/exceptions/all-exceptions-filter'
 import * as cookieParser from 'cookie-parser'
+import { PrismaService } from './core/prisma/prisma.service'
 
 const PORT = process.env.PORT
 const HOST = process.env.HOST
@@ -21,6 +22,9 @@ async function start() {
   app.use(cookieParser())
 
   const logger = app.get(Logger)
+
+  const prismaService = app.get(PrismaService)
+  await prismaService.enableShutdownHooks(app)
 
   app.setGlobalPrefix('api')
 

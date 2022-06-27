@@ -13,11 +13,13 @@ import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
 import { AuthMiddleware } from './modules/auth/middlewares/auth.middleware'
 import { JwtModule } from '@nestjs/jwt'
+import { PrismaModule } from './core/prisma/prisma.module'
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DataBaseModule,
+    PrismaModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'bundles'),
     }),
