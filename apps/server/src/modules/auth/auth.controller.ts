@@ -20,7 +20,7 @@ export class AuthController {
 
   @Post('registration')
   async registration(@Body() body) {
-    // return this.authService.registration(body)
+    console.log('registration')
   }
 
   @UseGuards(LocalAuthGuard)
@@ -38,7 +38,7 @@ export class AuthController {
 
   @Post('logout')
   async logout() {
-    // return this.authService.logout()
+    console.log('logout')
   }
 
   @UseGuards(RefreshTokenGuard)
@@ -66,9 +66,8 @@ export class AuthController {
       refreshToken: updatedToken.refreshToken,
     }
   }
-
-  // @UseGuards(RefreshTokenGuard)
-  // @UseGuards(JwtAuthGuard)
-  // @Post('regenerate-refresh-token')
-  // async regenerateRefreshToken() {}
 }
+
+// key1 - microservice 1
+// key = key1_blavla = 1
+// key = '{key1:{key:'value'}}'

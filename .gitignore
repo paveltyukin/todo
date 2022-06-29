@@ -12,3 +12,4 @@ apps/server/.env
 .nitro/
 .cache/
 custom_logs/
+yarn-error.log

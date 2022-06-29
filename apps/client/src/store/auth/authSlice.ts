@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import axios from 'axios'
 
 export interface AuthState {
   isAuth: boolean
@@ -11,6 +12,11 @@ const initialState: AuthState = {
   accessToken: '',
   fingerprint: '',
 }
+
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
+  const response = await axios.get('/fakeApi/users')
+  return response.data
+})
 
 export const authSlice = createSlice({
   name: 'auth',
@@ -26,7 +32,12 @@ export const authSlice = createSlice({
       state.fingerprint = payload
     },
   },
-  extraReducers: (builder) => {},
+  extraReducers(builder) {
+    builder.addCase(fetchUsers.fulfilled, (state, action) => {
+      console.log(234234234234234, action)
+      return action.payload
+    })
+  },
 })
 
 export const { setFingerprint, setAccessToken, setAuth } = authSlice.actions
