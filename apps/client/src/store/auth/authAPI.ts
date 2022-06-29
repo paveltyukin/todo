@@ -1,11 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import {
-  CheckAuthResponse,
-  LoginData,
-  LoginResponse,
-  RegisterData,
-  User,
-} from '../../types'
+import { LoginData, LoginResponse, RegisterData, User } from '../../types'
 import { RootState } from '../index'
 
 export const authApi = createApi({
@@ -52,12 +46,6 @@ export const authApi = createApi({
         url: 'logout',
       }),
     }),
-    checkAuth: builder.mutation<CheckAuthResponse, void>({
-      query: () => ({
-        url: 'check-auth',
-        method: 'POST',
-      }),
-    }),
   }),
 })
 
@@ -65,5 +53,4 @@ export const {
   useRegistrationUserMutation,
   useLoginMutation,
   useLogoutMutation,
-  useCheckAuthMutation,
 } = authApi

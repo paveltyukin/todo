@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import axios from 'axios'
+import { CheckAuthResponse } from '../../types'
+import $api from '../../api'
 
 export interface AuthState {
   isAuth: boolean
@@ -13,10 +14,17 @@ const initialState: AuthState = {
   fingerprint: '',
 }
 
-export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
-  const response = await axios.get('/fakeApi/users')
-  return response.data
-})
+export const checkAuth = createAsyncThunk(
+  'auth/checkAuth',
+  async (CheckAuthResponse, { rejectWithValue }) => {
+    try {
+      const result = await $api.post<CheckAuthResponse>('/check-auth')
+      return result.data
+    } catch (err) {
+      return rejectWithValue('Error!!')
+    }
+  }
+)
 
 export const authSlice = createSlice({
   name: 'auth',
@@ -33,9 +41,13 @@ export const authSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(fetchUsers.fulfilled, (state, action) => {
-      console.log(234234234234234, action)
-      return action.payload
+    builder.addCase(checkAuth.fulfilled, (state, { payload }) => {
+      setAuth(payload!.isAuth)
+      setAccessToken(payload!.accessToken)
+      localStorage.setItem('refreshToken', payload!.refreshToken)
+    })
+    builder.addCase(checkAuth.rejected, (state, { payload }) => {
+      console.log(payload)
     })
   },
 })
