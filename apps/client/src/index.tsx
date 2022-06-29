@@ -2,18 +2,14 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { store } from './store'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Login } from './pages/Login'
-import { Home } from './pages/Home'
-import { Registration } from './pages/Registration'
-import { RequireAuth } from './hocs/RequireAuth'
+import { BrowserRouter } from 'react-router-dom'
 import { checkAuth, setFingerprint } from './store/auth/authSlice'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
+import { Router } from './routes'
 
 const container = document.getElementById('root')!
 const root = createRoot(container)
 async function main() {
-  debugger
   const fp = await FingerprintJS.load()
   const result = await fp.get()
   store.dispatch(setFingerprint(result.visitorId))
@@ -23,22 +19,11 @@ async function main() {
     <React.StrictMode>
       <Provider store={store}>
         <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/registration" element={<Registration />} />
-            <Route
-              path="/"
-              element={
-                <RequireAuth>
-                  <Home />
-                </RequireAuth>
-              }
-            ></Route>
-          </Routes>
+          <Router />
         </BrowserRouter>
       </Provider>
     </React.StrictMode>
   )
 }
 
-main()
+main().catch((err) => console.error(err))

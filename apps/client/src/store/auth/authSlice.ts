@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { $api } from '../../api'
 import { CheckAuthResponse } from '../../types'
-import $api from '../../api'
 
 export interface AuthState {
   isAuth: boolean
@@ -16,10 +16,20 @@ const initialState: AuthState = {
 
 export const checkAuth = createAsyncThunk(
   'auth/checkAuth',
-  async (CheckAuthResponse, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const result = await $api.post<CheckAuthResponse>('/check-auth')
-      return result.data
+      const result = await $api('/auth/check-auth')
+      const res = (await result.json()) as CheckAuthResponse
+
+      if (!result.ok) {
+        setAuth(false)
+        setAccessToken('')
+      } else {
+        setAuth(res.isAuth)
+        setAccessToken(res.accessToken)
+      }
+
+      return res
     } catch (err) {
       return rejectWithValue('Error!!')
     }
