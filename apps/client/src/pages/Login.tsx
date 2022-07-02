@@ -1,6 +1,9 @@
 import { useForm } from 'react-hook-form'
 import { LoginData } from '../types'
 import { login } from '../store/auth/actions'
+import { useAppDispatch, useAppSelector } from '../store'
+import { useNavigate } from 'react-router-dom'
+import { getAuth } from '../store/auth/selectors'
 
 export const Login = () => {
   const {
@@ -8,9 +11,15 @@ export const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginData>()
+  const dispatch = useAppDispatch()
+  const navigation = useNavigate()
+  const isAuth = useAppSelector(getAuth)
 
   const onSubmit = async (data: LoginData) => {
-    await login(data)
+    await dispatch(login(data))
+    if (isAuth) {
+      navigation('/', { replace: true })
+    }
   }
 
   return (

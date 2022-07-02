@@ -32,7 +32,7 @@ const getHeaders = (state: RootState): OptionsParams => {
     headers['x-refresh-token'] = refreshToken
   }
 
-  return headers
+  return { headers }
 }
 
 export const checkAuth = createAsyncThunk<CheckAuthResponse, void, CheckAuthThunkAPI>(
