@@ -10,7 +10,7 @@ import {
 } from 'typeorm'
 import { UserEntity } from '../../user/entities/user.entity'
 
-@Entity({ schema: 'calc', name: 'tokens' })
+@Entity({ schema: 'public', name: 'tokens' })
 @Unique('fingerprint_and_refresh_token_uniq2', ['fingerprint', 'userId'])
 export class TokenEntity {
   @PrimaryGeneratedColumn()

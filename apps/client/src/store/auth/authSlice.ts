@@ -1,42 +1,25 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { $api } from '../../api'
-import { CheckAuthResponse } from '../../types'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { checkAuth } from './actions'
 
 export interface AuthState {
   isAuth: boolean
   accessToken: string
   fingerprint: string
+  errors: {
+    email: string[]
+    password: string[]
+  }
 }
 
 const initialState: AuthState = {
   isAuth: false,
   accessToken: '',
   fingerprint: '',
+  errors: {
+    email: [],
+    password: [],
+  },
 }
-
-export const checkAuth = createAsyncThunk<void, void>(
-  'auth/checkAuth',
-  async (_, thunkAPI) => {
-    try {
-      const result = await $api('/auth/check-auth')
-      const res = (await result.json()) as CheckAuthResponse
-
-      if (!result.ok) {
-        setAuth(false)
-        setAccessToken('')
-        localStorage.setItem('refreshToken', '')
-      } else {
-        setAuth(res.isAuth)
-        localStorage.setItem('accessToken', res.accessToken)
-        localStorage.setItem('refreshToken', res.refreshToken)
-      }
-
-      return res
-    } catch (err) {
-      return thunkAPI.rejectWithValue('Error!!')
-    }
-  }
-)
 
 export const authSlice = createSlice({
   name: 'auth',

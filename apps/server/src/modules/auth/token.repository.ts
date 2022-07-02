@@ -45,7 +45,7 @@ export class TokenRepository {
       const existToken = await this.tokenRepository.findOne({
         where: { userId, fingerprint },
       })
-      console.log(userId)
+
       await this.dataSource.transaction(async () => {
         if (existToken) {
           await this.tokenRepository.delete({
@@ -53,12 +53,12 @@ export class TokenRepository {
             fingerprint,
           })
         }
+
         token = await this.tokenRepository.save({
           userId,
           fingerprint,
           expiresIn: 1000 * 100 * 60 * 60,
         })
-        throw new HttpException({ message: 'dfdfdf' }, 401)
       })
 
       return token

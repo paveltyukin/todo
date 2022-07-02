@@ -6,6 +6,7 @@ export class LocalStorageService {
       value: value,
       expiry: now.getTime() + 60 * 60 * 24,
     }
+
     localStorage.setItem(key, JSON.stringify(item))
   }
 
@@ -23,6 +24,11 @@ export class LocalStorageService {
       localStorage.removeItem(key)
       return null
     }
+
     return item.value
+  }
+
+  static delete(key: string) {
+    localStorage.removeItem(key)
   }
 }

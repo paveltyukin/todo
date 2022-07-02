@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import authSlice from './auth/authSlice'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { authApi } from './auth/authAPI'
+import { $api } from '../api'
 
 export const store = configureStore({
   reducer: {
@@ -9,7 +10,11 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware),
+    getDefaultMiddleware({
+      thunk: {
+        extraArgument: { $api },
+      },
+    }).concat(authApi.middleware),
 })
 
 export type AppDispatch = typeof store.dispatch
@@ -21,7 +26,7 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 /*
 {
   status: OK | FAIL,
-  message: '' | 'ERROR',
+  message: '' | ['ERROR'],
   data: null | ...
 }
  */

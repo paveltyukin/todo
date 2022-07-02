@@ -14,6 +14,9 @@ import { AuthMiddleware } from './modules/auth/middlewares/auth.middleware'
 import { JwtModule } from '@nestjs/jwt'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { DATABASE_CONNECTION_NAME } from './core/constants'
+import { MailerModule } from '@nestjs-modules/mailer'
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter'
+import { MailModule } from './modules/mail/mail.module'
 
 @Module({
   imports: [
@@ -35,10 +38,25 @@ import { DATABASE_CONNECTION_NAME } from './core/constants'
           configService.get('TYPEORM_LOGGING') === 'debug'
             ? ['query', 'error']
             : ['error'],
+        logger: 'advanced-console',
       }),
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'bundles'),
+    }),
+    MailModule,
+    MailerModule.forRoot({
+      transport: process.env.MAIL_TRANSPORT,
+      defaults: {
+        from: '"TEST TEST" <test@test.test>',
+      },
+      template: {
+        dir: join(__dirname, '..', 'mail', 'templates'),
+        adapter: new EjsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
     }),
     AuthModule,
     UserModule,

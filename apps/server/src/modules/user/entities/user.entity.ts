@@ -8,7 +8,7 @@ import {
 } from 'typeorm'
 import { TokenEntity } from '../../auth/entities/token.entity'
 
-@Entity({ schema: 'calc', name: 'users' })
+@Entity({ schema: 'public', name: 'users' })
 export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number

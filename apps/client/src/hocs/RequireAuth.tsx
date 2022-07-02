@@ -1,12 +1,8 @@
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAppSelector } from '../store'
 import { getAuth } from '../store/auth/selectors'
 
-interface RequireAuthProps {
-  children: JSX.Element
-}
-
-export function RequireAuth({ children }: RequireAuthProps) {
+export function RequireAuth() {
   const location = useLocation()
   const isAuth = useAppSelector(getAuth)
 
@@ -14,5 +10,5 @@ export function RequireAuth({ children }: RequireAuthProps) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  return children
+  return <Outlet />
 }

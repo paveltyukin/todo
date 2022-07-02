@@ -6,18 +6,23 @@ import { Registration } from '../pages/Registration'
 import { RequireAuth } from '../hocs/RequireAuth'
 import { Profile } from '../pages/Profile'
 
+const unauthorizedRoutes = [
+  { path: '/login', element: <Login /> },
+  { path: '/registration', element: <Registration /> },
+]
+
+const requireRoutes = [
+  { path: '/', index: true, element: <Home /> },
+  { path: 'profile', element: <Profile /> },
+]
+
 export const Router = () => {
   return useRoutes([
-    { path: '/login', element: <Login /> },
-    { path: '/registration', element: <Registration /> },
+    ...unauthorizedRoutes,
     {
       path: '/',
-      element: (
-        <RequireAuth>
-          <Home />
-        </RequireAuth>
-      ),
-      children: [{ path: 'profile', element: <Profile /> }],
+      element: <RequireAuth />,
+      children: requireRoutes,
     },
     { path: '*', element: <NotFound /> },
   ])
