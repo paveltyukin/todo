@@ -18,7 +18,7 @@ export const $api = async (
     ...options.headers,
   }
 
-  const accessToken = store.getState().auth.accessToken
+  const accessToken = localStorage.getItem('accessToken') ?? ''
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`
   }
@@ -26,6 +26,11 @@ export const $api = async (
   const fingerprint = store.getState().auth.fingerprint
   if (fingerprint) {
     headers['x-fingerprint'] = fingerprint
+  }
+
+  const refreshToken = localStorage.getItem('refreshToken') ?? ''
+  if (refreshToken) {
+    headers['x-refresh-token'] = refreshToken
   }
 
   return fetch(`${process.env.REACT_APP_API_URL}${url}`, {

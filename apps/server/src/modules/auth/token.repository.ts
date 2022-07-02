@@ -7,13 +7,14 @@ import {
 } from '@nestjs/common'
 import { TokenEntity } from './entities/token.entity'
 import { TOKENS_REPOSITORY } from '../../core/constants'
-import { Repository } from 'typeorm'
+import { DataSource, Repository } from 'typeorm'
 
 @Injectable()
 export class TokenRepository {
   constructor(
     @Inject(TOKENS_REPOSITORY)
-    private readonly tokenRepository: Repository<TokenEntity>
+    private readonly tokenRepository: Repository<TokenEntity>,
+    private dataSource: DataSource
   ) {}
 
   async delete(

@@ -19,14 +19,14 @@ export const Login = () => {
   const onSubmit = async (data: LoginData) => {
     const response = (await login(data).unwrap()) as LoginResponse
     dispatch(setAuth(true))
-    dispatch(setAccessToken(response.accessToken))
     localStorage.setItem('refreshToken', response.refreshToken)
+    localStorage.setItem('accessToken', response.accessToken)
     navigate({ pathname: '/' })
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-      <input value="q@q.ru" {...register('email', { required: true })} />
+      <input value="test@test.ru" {...register('email', { required: true })} />
       {errors.password && <span>Почта: обязательное поле</span>}
 
       <input value="123" {...register('password', { required: true })} />

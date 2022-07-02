@@ -19,7 +19,6 @@ import { ConfigModule } from '@nestjs/config'
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '10m' },
     }),
-    // HttpModule,
   ],
   controllers: [AuthController],
   providers: [

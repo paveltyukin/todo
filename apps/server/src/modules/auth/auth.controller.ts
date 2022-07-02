@@ -4,9 +4,9 @@ import { LocalAuthGuard } from './guards/local-auth.guard'
 import { Request, Response } from 'express'
 import { TokenService } from './token.service'
 import { FingerprintGuard } from './guards/fingerprint.guard'
-import { RefreshTokenGuard } from './guards/refresh-token.guard'
 import { TokenRepository } from './token.repository'
 import { UserRepository } from '../user/user.repository'
+import { JwtAuthGuard } from './guards/jwt-auth.guard'
 
 @Controller('auth')
 @UseGuards(FingerprintGuard)
@@ -41,28 +41,18 @@ export class AuthController {
     console.log('logout')
   }
 
-  @UseGuards(RefreshTokenGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('check-auth')
   async checkAuth(@Req() req: Request) {
     const fingerprint = req.headers['x-fingerprint'] as string
-    const refreshTokenByRequest = req.headers['x-refresh-token'] as string
-    const currentToken =
-      await this.tokenService.findOneByRefreshTokenAndFingerprint(
-        refreshTokenByRequest,
-        fingerprint
-      )
 
     const updatedToken = await this.tokenRepository.update(
-      currentToken.userId,
+      req.user.id,
       fingerprint
     )
 
-    const user = await this.userRepository.findOneByIdForRequest(
-      currentToken.userId
-    )
-
     return {
-      accessToken: this.tokenService.generateAccessToken(user),
+      accessToken: req.tokens.accessToken,
       refreshToken: updatedToken.refreshToken,
     }
   }

@@ -14,9 +14,9 @@ const initialState: AuthState = {
   fingerprint: '',
 }
 
-export const checkAuth = createAsyncThunk(
+export const checkAuth = createAsyncThunk<void, void>(
   'auth/checkAuth',
-  async (_, { rejectWithValue }) => {
+  async (_, thunkAPI) => {
     try {
       const result = await $api('/auth/check-auth')
       const res = (await result.json()) as CheckAuthResponse
@@ -24,14 +24,16 @@ export const checkAuth = createAsyncThunk(
       if (!result.ok) {
         setAuth(false)
         setAccessToken('')
+        localStorage.setItem('refreshToken', '')
       } else {
         setAuth(res.isAuth)
-        setAccessToken(res.accessToken)
+        localStorage.setItem('accessToken', res.accessToken)
+        localStorage.setItem('refreshToken', res.refreshToken)
       }
 
       return res
     } catch (err) {
-      return rejectWithValue('Error!!')
+      return thunkAPI.rejectWithValue('Error!!')
     }
   }
 )
@@ -51,11 +53,6 @@ export const authSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(checkAuth.fulfilled, (state, { payload }) => {
-      setAuth(payload!.isAuth)
-      setAccessToken(payload!.accessToken)
-      localStorage.setItem('refreshToken', payload!.refreshToken)
-    })
     builder.addCase(checkAuth.rejected, (state, { payload }) => {
       console.log(payload)
     })
