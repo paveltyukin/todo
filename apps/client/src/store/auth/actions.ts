@@ -8,7 +8,7 @@ import { CheckAuthThunkAPI, LoginResponseThunkAPI } from './types'
 import { RootState } from '../index'
 import { HeaderParams, OptionsParams } from '../../api'
 
-const clearAuthParams = async (dispatch: ThunkDispatch<unknown, any, any>) => {
+const clearAuthParams = (dispatch: ThunkDispatch<unknown, any, any>) => {
   dispatch(setAuth(false))
   LocalStorageService.delete(ACCESS_TOKEN)
   LocalStorageService.delete(REFRESH_TOKEN)
@@ -49,7 +49,7 @@ export const checkAuth = createAsyncThunk<CheckAuthResponse, void, CheckAuthThun
       const res = (await rest.json()) as CheckAuthResponse
 
       if (!rest.ok) {
-        await clearAuthParams(dispatch)
+        clearAuthParams(dispatch)
       } else {
         dispatch(setAuth(true))
         LocalStorageService.setWithExpiry(ACCESS_TOKEN, res.accessToken)
@@ -63,25 +63,29 @@ export const checkAuth = createAsyncThunk<CheckAuthResponse, void, CheckAuthThun
   }
 )
 
-export const login = createAsyncThunk<void, LoginData, LoginResponseThunkAPI>(
+export const login = createAsyncThunk<boolean, LoginData, LoginResponseThunkAPI>(
   'auth/login',
   async (loginData, { rejectWithValue, dispatch, getState, extra: { $api } }) => {
     try {
+      let resultAuth = false
       const headers = getHeaders(getState() as RootState)
       const response = await $api(
         '/auth/login',
         { email: loginData.email, password: loginData.password },
         headers
       )
+
       const res = (await response.json()) as LoginResponse
 
       if (!response.ok) {
         await clearAuthParams(dispatch)
       } else {
-        dispatch(setAuth(true))
         LocalStorageService.setWithExpiry(ACCESS_TOKEN, res.accessToken)
         LocalStorageService.setWithExpiry(REFRESH_TOKEN, res.refreshToken)
+        resultAuth = true
       }
+
+      return resultAuth
     } catch (err) {
       return rejectWithValue('Error!!')
     }

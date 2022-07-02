@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { checkAuth } from './actions'
+import { checkAuth, login } from './actions'
 
 export interface AuthState {
   isAuth: boolean
@@ -38,6 +38,10 @@ export const authSlice = createSlice({
   extraReducers(builder) {
     builder.addCase(checkAuth.rejected, (state, { payload }) => {
       console.log(payload)
+    })
+    builder.addCase(login.fulfilled, (state, { payload }) => {
+      console.log('setAuth')
+      setAuth(true)
     })
   },
 })
