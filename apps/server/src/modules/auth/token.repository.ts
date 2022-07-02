@@ -40,23 +40,28 @@ export class TokenRepository {
     userId: number,
     fingerprint: string
   ): Promise<Partial<TokenEntity>> {
+    let token: Partial<TokenEntity>
     try {
       const existToken = await this.tokenRepository.findOne({
         where: { userId, fingerprint },
       })
-
-      if (existToken) {
-        await this.tokenRepository.delete({
+      console.log(userId)
+      await this.dataSource.transaction(async () => {
+        if (existToken) {
+          await this.tokenRepository.delete({
+            userId,
+            fingerprint,
+          })
+        }
+        token = await this.tokenRepository.save({
           userId,
           fingerprint,
+          expiresIn: 1000 * 100 * 60 * 60,
         })
-      }
-
-      return this.tokenRepository.save({
-        userId,
-        fingerprint,
-        expiresIn: 1000 * 100 * 60 * 60,
+        throw new HttpException({ message: 'dfdfdf' }, 401)
       })
+
+      return token
     } catch (e) {
       const error = e as Error
       throw new BadRequestException({ message: 'error.name = ' + error.name })
