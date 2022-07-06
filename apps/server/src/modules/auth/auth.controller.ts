@@ -17,7 +17,6 @@ import { TokenRepository } from './token.repository'
 import { UserRepository } from '../user/user.repository'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { MailerService } from '@nestjs-modules/mailer'
-import { join } from 'path'
 
 @Controller('auth')
 @UseGuards(FingerprintGuard)
@@ -39,10 +38,8 @@ export class AuthController {
   @Post('login')
   async login(@Req() req: Request, @Res() res: Response) {
     const fingerprint = req.headers['x-fingerprint'] as string
-    const refreshToken = await this.tokenRepository.add(
-      req.user.id,
-      fingerprint
-    )
+    const refreshToken = await this.tokenRepository.add(req.user.id, fingerprint)
+
     const accessToken = await this.tokenService.generateAccessToken(req.user)
 
     res.json({ accessToken, refreshToken: refreshToken.refreshToken })
@@ -57,10 +54,7 @@ export class AuthController {
   @Post('check-auth')
   async checkAuth(@Req() req: Request) {
     const fingerprint = req.headers['x-fingerprint'] as string
-    const updatedToken = await this.tokenRepository.update(
-      req.user.id,
-      fingerprint
-    )
+    const updatedToken = await this.tokenRepository.update(req.user.id, fingerprint)
 
     return {
       accessToken: req.tokens.accessToken,

@@ -1,21 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { UserEntity } from '../user/entities/user.entity'
-import { TokenEntity } from './entities/token.entity'
 import { TOKENS_REPOSITORY } from '../../core/constants'
-import { Repository } from 'typeorm'
 import { TokenRepository } from './token.repository'
+import { TokenType } from './providers/token.providers'
+import { User } from '../user/entities/user.entity'
+import { Token } from './entities/token.entity'
 
 @Injectable()
 export class TokenService {
   constructor(
     @Inject(TOKENS_REPOSITORY)
-    private readonly tokenEntityRepository: Repository<TokenEntity>,
+    private readonly tokenEntityRepository: TokenType,
     private readonly tokenRepository: TokenRepository,
     private readonly jwtService: JwtService
   ) {}
 
-  async generateAccessToken(user: Partial<UserEntity>): Promise<string> {
+  async generateAccessToken(user: Partial<User>): Promise<string> {
     const payload = {
       surname: user.surname,
       name: user.name,
@@ -30,15 +30,19 @@ export class TokenService {
   async findOneByRefreshTokenAndFingerprint(
     refreshToken: string,
     fingerprint: string
-  ): Promise<Partial<TokenEntity>> {
-    return this.tokenRepository.findOneOrFail({ refreshToken, fingerprint })
+  ): Promise<Partial<Token>> {
+    return this.tokenRepository.findOneByRefreshTokenAndFingerprint(refreshToken, fingerprint)
   }
 
   async findOneByRefreshTokenFingerprintUserId(
     refreshToken: string,
     fingerprint: string,
     userId: number
-  ): Promise<Partial<TokenEntity>> {
-    return this.tokenRepository.findOne({ refreshToken, fingerprint, userId })
+  ): Promise<Partial<Token>> {
+    return this.tokenRepository.findOne({
+      refreshToken,
+      fingerprint,
+      userId,
+    })
   }
 }

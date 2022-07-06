@@ -1,12 +1,11 @@
-import { DATABASE_CONNECTION, USERS_REPOSITORY } from '../../../core/constants'
-import { DataSource } from 'typeorm'
-import { UserEntity } from '../entities/user.entity'
+import { USERS_REPOSITORY } from '../../../core/constants'
+import { User } from '../entities/user.entity'
 
 export const userProviders = [
   {
     provide: USERS_REPOSITORY,
-    useFactory: (connection: DataSource) =>
-      connection.getRepository(UserEntity),
-    inject: [DATABASE_CONNECTION],
+    useValue: User,
   },
 ]
+
+export type UserType = typeof User

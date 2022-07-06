@@ -19,9 +19,7 @@ export const LoginForm = () => {
 
   const onSubmit = async (data: LoginData) => {
     await dispatch(login(data))
-    console.log('dispatch(login(data))')
-    console.log('isAuth')
-    debugger
+
     if (isAuth) {
       navigation('/', { replace: true })
     }

@@ -1,48 +1,28 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  Unique,
-  UpdateDateColumn,
-} from 'typeorm'
-import { UserEntity } from '../../user/entities/user.entity'
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
+import { User } from '../../user/entities/user.entity'
 
-@Entity({ schema: 'public', name: 'tokens' })
-@Unique('fingerprint_and_refresh_token_uniq2', ['fingerprint', 'userId'])
-export class TokenEntity {
-  @PrimaryGeneratedColumn()
+@Table({
+  schema: 'public',
+  tableName: 'tokens',
+  indexes: [{ name: 'fingerprint_and_refresh_token_uniq2', fields: ['fingerprint', 'userId'] }],
+})
+export class Token extends Model {
+  @Column({ type: DataType.BIGINT, primaryKey: true, autoIncrement: true })
   id: number
 
-  @Column()
+  @Column({ type: DataType.TEXT })
   fingerprint: string
 
-  @Column({
-    type: 'text',
-    name: 'refresh_token',
-    generated: 'uuid',
-    unique: true,
-  })
+  @Column({ type: DataType.TEXT })
   refreshToken: string
 
-  @Column({ name: 'expires_in' })
+  @Column({ type: DataType.INTEGER })
   expiresIn: number
 
-  @Column({ name: 'user_id' })
+  @ForeignKey(() => User)
+  @Column({ type: DataType.BIGINT })
   userId: number
 
-  @ManyToOne(() => UserEntity, (user) => user.tokens, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
-  user: UserEntity
-
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date
+  @BelongsTo(() => User)
+  user: User
 }

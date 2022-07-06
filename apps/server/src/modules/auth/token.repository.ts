@@ -5,29 +5,26 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { TokenEntity } from './entities/token.entity'
+import { Token } from './entities/token.entity'
 import { TOKENS_REPOSITORY } from '../../core/constants'
-import { DataSource, Repository } from 'typeorm'
+import { Sequelize } from 'sequelize-typescript'
+import { Attributes, FindOptions } from 'sequelize/types/model'
+import { TokenType } from './providers/token.providers'
+import { WhereOptions } from 'sequelize'
 
 @Injectable()
 export class TokenRepository {
   constructor(
     @Inject(TOKENS_REPOSITORY)
-    private readonly tokenRepository: Repository<TokenEntity>,
-    private dataSource: DataSource
+    private readonly tokenRepository: TokenType,
+    private sequelize: Sequelize
   ) {}
 
-  async delete(
-    userId: number,
-    fingerprint: string
-  ): Promise<Partial<TokenEntity>> {
-    let token: Partial<TokenEntity>
+  async delete(userId: number, fingerprint: string): Promise<Partial<Token>> {
+    let token: Partial<Token>
 
     try {
-      await this.tokenRepository.delete({
-        userId,
-        fingerprint,
-      })
+      await this.tokenRepository.destroy({ where: { userId, fingerprint } })
     } catch (e) {
       const error = e as Error
       throw new BadRequestException({ message: 'error.name = ' + error.name })
@@ -36,29 +33,29 @@ export class TokenRepository {
     return token
   }
 
-  async add(
-    userId: number,
-    fingerprint: string
-  ): Promise<Partial<TokenEntity>> {
-    let token: Partial<TokenEntity>
+  async add(userId: number, fingerprint: string): Promise<Partial<Token>> {
+    let token: Partial<Token>
     try {
       const existToken = await this.tokenRepository.findOne({
         where: { userId, fingerprint },
       })
 
-      await this.dataSource.transaction(async () => {
+      await this.sequelize.transaction(async (t) => {
         if (existToken) {
-          await this.tokenRepository.delete({
-            userId,
-            fingerprint,
+          await this.tokenRepository.destroy({
+            where: { userId, fingerprint },
+            transaction: t,
           })
         }
 
-        token = await this.tokenRepository.save({
-          userId,
-          fingerprint,
-          expiresIn: 1000 * 100 * 60 * 60,
-        })
+        token = await this.tokenRepository.create(
+          {
+            userId,
+            fingerprint,
+            expiresIn: 1000 * 100 * 60 * 60,
+          },
+          { transaction: t }
+        )
       })
 
       return token
@@ -68,43 +65,29 @@ export class TokenRepository {
     }
   }
 
-  async update(
-    userId: number,
-    fingerprint: string
-  ): Promise<Partial<TokenEntity>> {
-    try {
-      const exists = this.tokenRepository.findOne({
-        where: {
-          userId,
-          fingerprint,
-        },
-      })
-
-      if (!exists) {
-        new NotFoundException('не найден')
-      }
-
-      await this.tokenRepository.delete({
-        userId,
-        fingerprint,
-      })
-
-      return this.tokenRepository.save({
-        userId,
-        fingerprint,
-        expiresIn: 1000 * 100 * 60 * 60,
-      })
-    } catch (e) {
-      const error = e as Error
-      throw new BadRequestException({ message: 'error.name = ' + error.name })
-    }
-  }
-
-  async findOne(where: Partial<TokenEntity>): Promise<Partial<TokenEntity>> {
-    let token: Partial<TokenEntity>
+  async update(userId: number, fingerprint: string): Promise<Partial<Token>> {
+    let token: Partial<Token>
 
     try {
-      token = await this.tokenRepository.findOne({ where })
+      await this.sequelize.transaction(async (t) => {
+        const exists = this.tokenRepository.findOne({
+          where: { userId, fingerprint },
+        })
+
+        if (!exists) {
+          new NotFoundException('не найден')
+        }
+
+        await this.tokenRepository.destroy({
+          where: { userId, fingerprint },
+          transaction: t,
+        })
+
+        token = await this.tokenRepository.create(
+          { userId, fingerprint, expiresIn: 1000 * 100 * 60 * 60 },
+          { transaction: t }
+        )
+      })
     } catch (e) {
       const error = e as Error
       throw new BadRequestException({ message: 'error.name = ' + error.name })
@@ -113,17 +96,51 @@ export class TokenRepository {
     return token
   }
 
-  async findOneOrFail(
-    where: Partial<TokenEntity>
-  ): Promise<Partial<TokenEntity>> {
-    let token: Partial<TokenEntity>
+  async findOneByRefreshTokenAndFingerprint(
+    refreshToken: string,
+    fingerprint: string
+  ): Promise<Partial<Token>> {
+    let token: Partial<Token>
 
     try {
-      token = await this.tokenRepository.findOne({ where })
+      token = await this.tokenRepository.findOne({
+        where: { refreshToken, fingerprint },
+      })
+    } catch (e) {
+      const error = e as Error
+      throw new BadRequestException({ message: 'error.name = ' + error.name })
+    }
+
+    return token
+  }
+
+  async findOneByRefreshTokenAndFingerprintOrFail(
+    refreshToken: string,
+    fingerprint: string
+  ): Promise<Partial<Token>> {
+    let token: Partial<Token>
+
+    try {
+      token = await this.tokenRepository.findOne({
+        where: { refreshToken, fingerprint },
+      })
 
       if (!token) {
         throw new HttpException({ message: 'Not found' }, 400)
       }
+    } catch (e) {
+      const error = e as Error
+      throw new BadRequestException({ message: 'error.name = ' + error.name })
+    }
+
+    return token
+  }
+
+  async findOne(where: WhereOptions<Token>): Promise<Partial<Token>> {
+    let token: Partial<Token>
+
+    try {
+      token = await this.tokenRepository.findOne({ where: { where } })
     } catch (e) {
       const error = e as Error
       throw new BadRequestException({ message: 'error.name = ' + error.name })

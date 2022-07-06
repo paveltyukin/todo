@@ -1,26 +1,18 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcryptjs'
-import { UserEntity } from './entities/user.entity'
-import { USERS_REPOSITORY } from '../../core/constants'
-import { Repository } from 'typeorm'
+import { User } from './entities/user.entity'
 import { AuthPassportLoginDto } from '../auth/dto/auth-passport-login.dto'
+import { UserRepository } from './user.repository'
 
 @Injectable()
 export class UserService {
-  constructor(
-    @Inject(USERS_REPOSITORY)
-    private readonly userEntityRepository: Repository<UserEntity>
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
-  async validateUser(
-    loginData: AuthPassportLoginDto
-  ): Promise<Partial<UserEntity>> {
-    let user: Partial<UserEntity>
+  async validateUser(loginData: AuthPassportLoginDto): Promise<Partial<User>> {
+    let user: Partial<User>
 
     try {
-      user = await this.userEntityRepository.findOneOrFail({
-        where: { email: loginData.email },
-      })
+      user = await this.userRepository.findOneByEmailOrFail(loginData.email)
     } catch (e) {
       throw new BadRequestException('wewewe')
     }
@@ -29,10 +21,7 @@ export class UserService {
       throw new BadRequestException('fgtrttgrtgrg')
     }
 
-    const passwordEquals = await bcrypt.compare(
-      loginData.password,
-      user.password
-    )
+    const passwordEquals = await bcrypt.compare(loginData.password, user.password)
 
     if (!passwordEquals) {
       throw new BadRequestException('Введите правильно логин, пароль')
@@ -44,8 +33,8 @@ export class UserService {
     return result
   }
 
-  async findOne(email: string): Promise<UserEntity | undefined> {
-    return this.userEntityRepository.findOneOrFail({ where: { email } })
+  async findOne(email: string): Promise<Partial<User>> {
+    return this.userRepository.findOneByEmailOrFail(email)
   }
 
   async generatePassword(password: string) {

@@ -1,42 +1,35 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm'
-import { TokenEntity } from '../../auth/entities/token.entity'
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript'
+import { Token } from '../../auth/entities/token.entity'
 
-@Entity({ schema: 'public', name: 'users' })
-export class UserEntity {
-  @PrimaryGeneratedColumn()
+@Table({
+  schema: 'public',
+  tableName: 'users',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+  deletedAt: 'deleted_at',
+})
+export class User extends Model {
+  @Column({ type: DataType.BIGINT, autoIncrement: true, primaryKey: true })
   id: number
 
-  @Column({ type: 'text' })
+  @Column({ type: DataType.TEXT })
   name: string
 
-  @Column({ type: 'text' })
+  @Column({ type: DataType.TEXT })
   surname: string
 
-  @Column({ type: 'text' })
+  @Column({ type: DataType.TEXT })
   patronymic: string
 
-  @Column({ unique: true })
+  @Column({ type: DataType.TEXT, unique: true })
   email: string
 
-  @Column({ type: 'text' })
+  @Column({ type: DataType.TEXT })
   password: string
 
-  @Column({ name: 'is_activated', default: false })
+  @Column({ type: DataType.BOOLEAN, field: 'is_activated', defaultValue: false })
   isActivated: boolean
 
-  @OneToMany(() => TokenEntity, (token) => token.user)
-  tokens: TokenEntity[]
-
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date
+  @HasMany(() => Token)
+  tokens: Token[]
 }
