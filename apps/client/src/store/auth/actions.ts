@@ -63,11 +63,10 @@ export const checkAuth = createAsyncThunk<CheckAuthResponse, void, CheckAuthThun
   }
 )
 
-export const login = createAsyncThunk<boolean, LoginData, LoginResponseThunkAPI>(
+export const login = createAsyncThunk<void, LoginData, LoginResponseThunkAPI>(
   'auth/login',
   async (loginData, { rejectWithValue, dispatch, getState, extra: { $api } }) => {
     try {
-      let resultAuth = false
       const headers = getHeaders(getState() as RootState)
       const response = await $api(
         '/auth/login',
@@ -82,10 +81,7 @@ export const login = createAsyncThunk<boolean, LoginData, LoginResponseThunkAPI>
       } else {
         LocalStorageService.setWithExpiry(ACCESS_TOKEN, res.accessToken)
         LocalStorageService.setWithExpiry(REFRESH_TOKEN, res.refreshToken)
-        resultAuth = true
       }
-
-      return resultAuth
     } catch (err) {
       return rejectWithValue('Error!!')
     }

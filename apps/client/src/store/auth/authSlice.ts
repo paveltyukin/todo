@@ -40,8 +40,7 @@ export const authSlice = createSlice({
       console.log(payload)
     })
     builder.addCase(login.fulfilled, (state, { payload }) => {
-      console.log('setAuth')
-      setAuth(true)
+      state.isAuth = true
     })
   },
 })

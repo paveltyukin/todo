@@ -12,4 +12,7 @@ apps/server/.env
 .nitro/
 .cache/
 custom_logs/
+!custom_logs/.gitkeep
+certs/
+!certs/.gitkeep
 yarn-error.log

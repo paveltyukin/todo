@@ -47,12 +47,11 @@ export class JwtAuthGuard implements CanActivate {
         throw new HttpException({ message: 'token error' }, 401)
       }
 
-      const existRefreshToken =
-        await this.tokenService.findOneByRefreshTokenFingerprintUserId(
-          refreshToken,
-          fingerprint,
-          isVerified.sub
-        )
+      const existRefreshToken = await this.tokenService.findOneByRefreshTokenFingerprintUserId(
+        refreshToken,
+        fingerprint,
+        isVerified.sub
+      )
 
       if (!existRefreshToken) {
         throw new HttpException({ message: 'refresh token error' }, 401)
@@ -63,21 +62,15 @@ export class JwtAuthGuard implements CanActivate {
     } catch (e) {
       const error = e as Error
       if (error.name === 'TokenExpiredError') {
-        const decodedJwtAccessToken = this.jwtService.decode(
-          authHeaderParts[1]
-        ) as JwtPayload
+        const decodedJwtAccessToken = this.jwtService.decode(authHeaderParts[1]) as JwtPayload
 
         const refreshToken = await this.tokenRepository.update(
           decodedJwtAccessToken.sub,
           fingerprint
         )
 
-        req.user = await this.userRepository.findOneByIdForRequest(
-          decodedJwtAccessToken.sub
-        )
-        const accessToken = await this.tokenService.generateAccessToken(
-          req.user
-        )
+        req.user = await this.userRepository.findOneByIdForRequest(decodedJwtAccessToken.sub)
+        const accessToken = await this.tokenService.generateAccessToken(req.user)
 
         req.tokens = {
           accessToken,

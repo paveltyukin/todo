@@ -1,16 +1,14 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { User } from './entities/user.entity'
 import { UserPayload } from '../auth/types'
-import { USERS_REPOSITORY } from '../../core/constants'
-import { UserType } from './providers/user.providers'
-import { Attributes, FindOptions } from 'sequelize/types/model'
-import { Token } from '../auth/entities/token.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class UserRepository {
   constructor(
-    @Inject(USERS_REPOSITORY)
-    private readonly userEntityRepository: UserType
+    @InjectRepository(User)
+    private readonly userEntityRepository: Repository<User>
   ) {}
 
   async findOne(where: Partial<User>): Promise<Partial<User>> {

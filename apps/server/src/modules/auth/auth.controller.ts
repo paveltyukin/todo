@@ -39,7 +39,6 @@ export class AuthController {
   async login(@Req() req: Request, @Res() res: Response) {
     const fingerprint = req.headers['x-fingerprint'] as string
     const refreshToken = await this.tokenRepository.add(req.user.id, fingerprint)
-
     const accessToken = await this.tokenService.generateAccessToken(req.user)
 
     res.json({ accessToken, refreshToken: refreshToken.refreshToken })

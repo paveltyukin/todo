@@ -1,16 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { TOKENS_REPOSITORY } from '../../core/constants'
 import { TokenRepository } from './token.repository'
-import { TokenType } from './providers/token.providers'
 import { User } from '../user/entities/user.entity'
 import { Token } from './entities/token.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class TokenService {
   constructor(
-    @Inject(TOKENS_REPOSITORY)
-    private readonly tokenEntityRepository: TokenType,
+    @InjectRepository(Token)
+    private readonly tokenEntityRepository: Repository<Token>,
     private readonly tokenRepository: TokenRepository,
     private readonly jwtService: JwtService
   ) {}
@@ -23,8 +23,7 @@ export class TokenService {
       email: user.email,
       sub: user.id,
     }
-
-    return await this.jwtService.signAsync(payload)
+    return this.jwtService.signAsync(payload)
   }
 
   async findOneByRefreshTokenAndFingerprint(

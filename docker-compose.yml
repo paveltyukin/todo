@@ -2,46 +2,10 @@ version: '3.7'
 
 services:
 
-  mail:
-    image: bytemark/smtp
-    restart: always
-    ports:
-      - "25:25"
-    environment:
-      RELAY_HOST: smtp.example.com
-      RELAY_PORT: 587
-      RELAY_USERNAME: alice@example.com
-      RELAY_PASSWORD: secretpassword
-
   redis:
     image: redis
     ports:
       - 17382:6379
-
-  server:
-    build:
-      context: ./apps/server
-    depends_on:
-      - redis
-    volumes:
-      - ./apps/server:/app
-    ports:
-      - '2000:2000'
-    networks:
-      - default
-      - serverdb
-
-  nginx:
-    image: nginx:alpine
-    volumes:
-      - ./apps/server/nginx.conf:/etc/nginx/conf.d/default.conf
-    environment:
-      - VIRTUAL_HOST=todo.dev.local
-    networks:
-      - default
-      - outside
-    depends_on:
-      - server
 
 networks:
   serverdb:

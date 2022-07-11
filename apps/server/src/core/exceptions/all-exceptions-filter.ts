@@ -1,10 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common'
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common'
 import { customWriteLog } from '../utils/customWriteLog'
 import { HttpAdapterHost } from '@nestjs/core'
 import { Response } from 'express'
@@ -28,9 +22,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     const httpStatus =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR
+      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR
 
     customWriteLog(`${url}: ${message}`)
 

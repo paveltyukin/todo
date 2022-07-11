@@ -1,35 +1,25 @@
-import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript'
-import { Token } from '../../auth/entities/token.entity'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
-@Table({
-  schema: 'public',
-  tableName: 'users',
-  createdAt: 'created_at',
-  updatedAt: 'updated_at',
-  deletedAt: 'deleted_at',
-})
-export class User extends Model {
-  @Column({ type: DataType.BIGINT, autoIncrement: true, primaryKey: true })
+@Entity({ schema: 'public', name: 'users' })
+export class User {
+  @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ type: DataType.TEXT })
+  @Column({ type: 'text' })
   name: string
 
-  @Column({ type: DataType.TEXT })
+  @Column({ type: 'text' })
   surname: string
 
-  @Column({ type: DataType.TEXT })
+  @Column({ type: 'text' })
   patronymic: string
 
-  @Column({ type: DataType.TEXT, unique: true })
+  @Column({ type: 'text', unique: true })
   email: string
 
-  @Column({ type: DataType.TEXT })
+  @Column({ type: 'text' })
   password: string
 
-  @Column({ type: DataType.BOOLEAN, field: 'is_activated', defaultValue: false })
+  @Column({ type: 'boolean', name: 'is_activated', default: false })
   isActivated: boolean
-
-  @HasMany(() => Token)
-  tokens: Token[]
 }

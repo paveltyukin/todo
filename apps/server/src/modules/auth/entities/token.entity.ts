@@ -1,28 +1,20 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
-import { User } from '../../user/entities/user.entity'
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
 
-@Table({
-  schema: 'public',
-  tableName: 'tokens',
-  indexes: [{ name: 'fingerprint_and_refresh_token_uniq2', fields: ['fingerprint', 'userId'] }],
-})
-export class Token extends Model {
-  @Column({ type: DataType.BIGINT, primaryKey: true, autoIncrement: true })
+@Entity({ schema: 'public', name: 'tokens' })
+@Index(['fingerprint', 'userId'], { unique: true })
+export class Token {
+  @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ type: DataType.TEXT })
+  @Column({ type: 'text' })
   fingerprint: string
 
-  @Column({ type: DataType.TEXT })
+  @Column({ type: 'text' })
   refreshToken: string
 
-  @Column({ type: DataType.INTEGER })
+  @Column({ type: 'integer' })
   expiresIn: number
 
-  @ForeignKey(() => User)
-  @Column({ type: DataType.BIGINT })
+  @Column({ type: 'bigint', name: 'user_id' })
   userId: number
-
-  @BelongsTo(() => User)
-  user: User
 }
