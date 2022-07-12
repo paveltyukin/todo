@@ -19,10 +19,10 @@ export const LoginForm = () => {
 
   const onSubmit = async (data: LoginData) => {
     await dispatch(login(data))
+  }
 
-    if (isAuth) {
-      navigation('/', { replace: true })
-    }
+  if (isAuth) {
+    navigation('/', { replace: true })
   }
 
   return (

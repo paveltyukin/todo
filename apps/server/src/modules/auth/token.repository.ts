@@ -40,7 +40,7 @@ export class TokenRepository {
         await this.tokenRepository.delete({ userId, fingerprint })
       }
 
-      token = await this.tokenRepository.create({
+      token = await this.tokenRepository.save({
         userId,
         fingerprint,
         expiresIn: 1000 * 100 * 60 * 60,
@@ -67,7 +67,7 @@ export class TokenRepository {
 
       await this.tokenRepository.delete({ userId, fingerprint })
 
-      token = await this.tokenRepository.create({
+      token = await this.tokenRepository.save({
         userId,
         fingerprint,
         expiresIn: 1000 * 100 * 60 * 60,
