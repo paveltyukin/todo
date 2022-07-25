@@ -1,5 +1,5 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from './modules/auth/auth.module'
 import { UserModule } from './modules/user/user.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
@@ -33,11 +33,6 @@ import { AppController } from './app.controller'
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'bundles'),
-      serveStaticOptions: {
-        setHeaders: (res: any) => {
-          res.set('csrf-token', '123123123')
-        },
-      },
     }),
     MailModule,
     MailerModule.forRoot({

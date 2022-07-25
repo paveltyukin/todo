@@ -9,18 +9,18 @@ import { checkAuth } from './store/auth/actions'
 const container = document.getElementById('root')!
 const root = createRoot(container)
 
-const main = async () => {
-  await store.dispatch(checkAuth())
+store.dispatch(checkAuth())
 
-  root.render(
-    <StrictMode>
-      <Provider store={store}>
-        <BrowserRouter>
-          <Router />
-        </BrowserRouter>
-      </Provider>
-    </StrictMode>
-  )
-}
-
-main().catch((err) => console.error(err))
+root.render(
+  <StrictMode>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Router />
+      </BrowserRouter>
+    </Provider>
+  </StrictMode>
+)
+// const main = async () => {
+// }
+//
+// main().catch((err) => console.error(err))

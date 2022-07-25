@@ -23,7 +23,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "client:start": "PORT=2001 react-scripts start",
+    "client:dev:full": "rm -rf node_modules && yarn && PORT=2001 react-scripts start",
     "client:build": "react-scripts build && rm -rf ../server/bundles && mv ./build ../server/bundles",
     "client:test": "react-scripts test",
     "client:eject": "react-scripts eject"

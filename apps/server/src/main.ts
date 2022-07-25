@@ -7,24 +7,12 @@ import * as morgan from 'morgan'
 import { ValidationPipe } from './core/pipes/validation.pipe'
 import { AllExceptionsFilter } from './core/exceptions/all-exceptions-filter'
 import { loggerMiddleware } from './core/middlewares/logger.middleware'
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 
 const PORT = process.env.PORT
 const HOST = process.env.HOST
 
 async function start() {
-  const ssl = process.env.SSL === 'yes'
   const options: NestApplicationOptions = { logger: ['log', 'error', 'warn', 'debug', 'verbose'] }
-
-  if (ssl) {
-    const key = await readFile(join(__dirname, process.env.SSL_KEY_PATH))
-    const cert = await readFile(join(__dirname, process.env.SSL_CERT_PATH))
-    options.httpsOptions = {}
-    options.httpsOptions.key = key
-    options.httpsOptions.cert = cert
-  }
-
   const app = await NestFactory.create<NestExpressApplication>(AppModule, options)
 
   app.use(loggerMiddleware)

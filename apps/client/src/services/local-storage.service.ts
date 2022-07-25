@@ -4,7 +4,7 @@ export class LocalStorageService {
 
     const item = {
       value: value,
-      expiry: now.getTime() + 60 * 60 * 24,
+      expiry: now.getTime() + 1000 * 60 * 60 * 24,
     }
 
     localStorage.setItem(key, JSON.stringify(item))

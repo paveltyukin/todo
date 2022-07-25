@@ -7,13 +7,14 @@ import {
 } from '@nestjs/common'
 import { Token } from './entities/token.entity'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { DataSource, Repository } from 'typeorm'
 
 @Injectable()
 export class TokenRepository {
   constructor(
     @InjectRepository(Token)
-    private readonly tokenRepository: Repository<Token>
+    private readonly tokenRepository: Repository<Token>,
+    private readonly dataSource: DataSource
   ) {}
 
   async delete(userId: number, fingerprint: string): Promise<Partial<Token>> {
@@ -31,26 +32,46 @@ export class TokenRepository {
 
   async add(userId: number, fingerprint: string): Promise<Partial<Token>> {
     let token: Partial<Token>
+
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+
     try {
-      const existToken = await this.tokenRepository.findOne({
+      const existToken = await queryRunner.manager.findOne(Token, {
         where: { userId, fingerprint },
       })
 
       if (existToken) {
-        await this.tokenRepository.delete({ userId, fingerprint })
+        await queryRunner.manager.delete(Token, { userId, fingerprint })
       }
 
-      token = await this.tokenRepository.save({
+      token = await queryRunner.manager.save(Token, {
         userId,
         fingerprint,
         expiresIn: 1000 * 100 * 60 * 60,
       })
 
-      return token
+      await queryRunner.manager.update(
+        Token,
+        { userId, fingerprint },
+        {
+          userId,
+          fingerprint,
+          expiresIn: 1000,
+        }
+      )
+
+      await queryRunner.commitTransaction()
     } catch (e) {
+      await queryRunner.rollbackTransaction()
       const error = e as Error
       throw new BadRequestException({ message: 'error.name = ' + error.name })
+    } finally {
+      await queryRunner.release()
     }
+
+    return token
   }
 
   async update(userId: number, fingerprint: string): Promise<Partial<Token>> {

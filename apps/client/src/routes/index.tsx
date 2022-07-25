@@ -16,6 +16,11 @@ const requireRoutes = [
   { path: 'profile', element: <Profile /> },
 ]
 
+const requireRoutes2 = [
+  { path: '/', index: true, element: <Home /> },
+  { path: 'profile2', element: <Profile /> },
+]
+
 export const Router = () => {
   return useRoutes([
     ...unauthorizedRoutes,

@@ -3,10 +3,11 @@ import { CheckAuthResponse, LoginData, LoginResponse } from '../../types'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 import { LocalStorageService } from '../../services/local-storage.service'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../../constants'
-import { setAuth, setFingerprint } from './authSlice'
+import { setAuth, setFingerprint, setIsLoading } from './authSlice'
 import { CheckAuthThunkAPI, LoginResponseThunkAPI } from './types'
 import { RootState } from '../index'
 import { HeaderParams, OptionsParams } from '../../api'
+import { debug } from 'util'
 
 const clearAuthParams = (dispatch: ThunkDispatch<unknown, any, any>) => {
   dispatch(setAuth(false))
@@ -44,6 +45,7 @@ export const checkAuth = createAsyncThunk<CheckAuthResponse, void, CheckAuthThun
 
       dispatch(setFingerprint(result.visitorId))
       const headers = getHeaders(getState() as RootState)
+      dispatch(setIsLoading(true))
 
       const rest = await $api('/auth/check-auth', {}, headers)
       const res = (await rest.json()) as CheckAuthResponse
@@ -56,6 +58,7 @@ export const checkAuth = createAsyncThunk<CheckAuthResponse, void, CheckAuthThun
         LocalStorageService.setWithExpiry(REFRESH_TOKEN, res.refreshToken)
       }
 
+      dispatch(setIsLoading(false))
       return res
     } catch (err) {
       return rejectWithValue('Error!!')
@@ -87,3 +90,4 @@ export const login = createAsyncThunk<void, LoginData, LoginResponseThunkAPI>(
     }
   }
 )
+

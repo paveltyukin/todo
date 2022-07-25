@@ -9,6 +9,7 @@ import { TokenRepository } from './token.repository'
 import { ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Token } from './entities/token.entity'
+import { TokenSubscribe } from './token.subscribe'
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { Token } from './entities/token.entity'
     PassportModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, TokenService, TokenRepository],
+  providers: [AuthService, TokenService, TokenRepository, TokenSubscribe],
   exports: [AuthService],
 })
 export class AuthModule {}
